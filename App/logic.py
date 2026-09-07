@@ -1,11 +1,47 @@
 import time
+import csv
+import os
+from DataStructures.List import array_list as al
+from DataStructures.List import liststructure as lt
 
-def new_logic():
-    """
-    Crea el catalogo para almacenar las estructuras de datos
-    """
+csv.field_size_limit(2147483647)
+
+data_dir = os.path.dirname(os.path.realpath('__file__')) + '/Data/GoodReads'
+
+def new_logic(user_data_structure):
+    
+    global data_structure
+    
+    if user_data_structure == "1":
+        data_structure = al
+    else:
+        data_structure = lt
+        
+    pedidos = {"Order_ID": None,
+               "Product": None,
+               "Country": None,
+               "Channel": None,
+               "Order_Date": None,
+               "Discount_Pct": None,
+               "Price_per_Box": None,
+               "Marketing_Spend": None,
+               "Boxes_Shipped": None,
+               "Amount": None}
+    
+    pedidos["Order_ID"] = lt.new_ilst()
+    pedidos["Product"] = lt.new_ilst()
+    pedidos["Country"] = lt.new_ilst()
+    pedidos["Channel"] = lt.new_ilst()
+    pedidos["Order_Date"] = lt.new_ilst()
+    pedidos["Discount_Pct"] = lt.new_ilst()
+    pedidos["Price_per_Box"] = lt.new_ilst()
+    pedidos["Marketing_Spend"] = lt.new_ilst()
+    pedidos["Boxes_Shipped"] = lt.new_ilst()
+    pedidos["Amount"] = lt.new_ilst()
+    
+    
     #TODO: Llama a las funciónes de creación de las estructuras de datos
-    pass
+    return pedidos
 
 
 # Funciones para la carga de datos
@@ -15,7 +51,13 @@ def load_data(catalog, filename):
     Carga los datos del reto
     """
     # TODO: Realizar la carga de datos
+    booksfile = data_dir + '/chocolate_sale_100_ptc'
+    input_file = csv.DictReader(open(booksfile, encoding='utf-8'))
+    for pedido in input_file:
+        add_book(catalog, book)
+    return book_size(catalog), author_size(catalog)
     pass
+
 
 # Funciones de consulta sobre el catálogo
 
