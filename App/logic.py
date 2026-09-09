@@ -78,12 +78,67 @@ def req_2(catalog):
     pass
 
 
-def req_3(catalog):
+def req_3(catalog, Contry, Channel):
     """
     Retorna el resultado del requerimiento 3
     """
     # TODO: Modificar el requerimiento 3
-    pass
+    #pass
+    start_time = get_time()
+    tamaño=data_structure.size(catalog["Order_ID"])
+    N=0
+    suma_precio=0
+    suma_descuento=0
+    suma_marketing=0
+    suma_cajas=0
+    
+    productos = {}
+    años = {}
+
+    for i in range(tamaño):
+        pais = data_structure.get_element(catalog["Country"], i)
+        canal = data_structure.get_element(catalog["Channel"], i)
+        
+        if pais == Contry and canal == Channel:
+            N += 1
+            
+            precio = float(data_structure.get_element(catalog["Price_per_Box"], i))
+            descuento = float(data_structure.get_element(catalog["Discount_Pct"], i))
+            marketing = float(data_structure.get_element(catalog["Marketing_Spend"], i))
+            cajas = int(data_structure.get_element(catalog["Boxes_Shipped"], i))
+            
+            suma_precio += precio
+            suma_descuento += descuento
+            suma_marketing += marketing
+            suma_cajas += cajas
+            
+            prod = data_structure.get_element(catalog["Product"], i)
+            productos[prod] = productos.get(prod, 0) + 1
+            
+            date_val = str(data_structure.get_element(catalog["Order_Date"], i))
+            year = date_val[:4]
+            años[year] = años.get(year, 0) + 1
+
+    
+    
+    if N == 0:
+        return delta_time(start_time, end_time), 0, 0, 0, 0, 0, "Unknown", "Unknown"
+
+    Prom_precio = suma_precio / N
+    Prom_descuento = suma_descuento / N
+    Prom_marketing = suma_marketing / N
+    Prom_cajas = suma_cajas / N
+    
+    Moda_producto = max(productos, key=productos.get)
+    Moda_año = max(años, key=años.get)
+    end_time = get_time()
+    pop_time = delta_time(start_time, end_time)
+
+    return pop_time, N, Prom_precio, Prom_cajas, Prom_descuento, Prom_marketing, Moda_año, Moda_producto
+    
+    
+    
+
 
 
 def req_4(catalog):
@@ -101,12 +156,13 @@ def req_5(catalog):
     # TODO: Modificar el requerimiento 5
     pass
 
-def req_6(catalog):
+def req_6(catalog, Fecha_inicial, Fecha_final):
     """
     Retorna el resultado del requerimiento 6
     """
     # TODO: Modificar el requerimiento 6
-    pass
+    #pass
+
 
 
 # Funciones para medir tiempos de ejecucion
