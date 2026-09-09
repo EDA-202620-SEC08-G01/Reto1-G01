@@ -162,6 +162,74 @@ def req_6(catalog, Fecha_inicial, Fecha_final):
     """
     # TODO: Modificar el requerimiento 6
     #pass
+    start_time = get_time()
+    tamaño = data_structure.size(catalog["Order_ID"])
+    N = 0
+    canales = {}
+
+    for i in range(tamaño):
+        fecha = str(data_structure.get_element(catalog["Order_Date"], i))
+        
+        if Fecha_inicial <= fecha <= Fecha_final:
+            N += 1
+            canal = data_structure.get_element(catalog["Channel"], i)
+            
+            orden = data_structure.get_element(catalog["Order_ID"], i)
+            producto = data_structure.get_element(catalog["Product"], i)
+            pais = data_structure.get_element(catalog["Country"], i)
+            monto = float(data_structure.get_element(catalog["Amount"], i))
+            precio = float(data_structure.get_element(catalog["Price_per_Box"], i))
+            marketing = float(data_structure.get_element(catalog["Marketing_Spend"], i))
+            cajas = int(data_structure.get_element(catalog["Boxes_Shipped"], i))
+            
+            pedido_actual = {
+                "Order_ID": orden,
+                "Product": producto,
+                "Country": pais,
+                "Channel": canal,
+                "Order_Date": fecha,
+                "Price_per_Box": precio,
+                "Boxes_Shipped": cajas,
+                "Amount": monto
+            }
+            
+            if canal not in canales:
+                canales[canal] = {
+                    'count': 0,
+                    'total_amt': 0.0,
+                    'sum_price': 0.0,
+                    'sum_mkt': 0.0,
+                    'min_order': pedido_actual,
+                    'max_order': pedido_actual
+                }
+            
+            c = canales[canal]
+            c['count'] += 1
+            c['total_amt'] += monto
+            c['sum_price'] += precio
+            c['sum_mkt'] += marketing
+            
+            # Criterio de desempate para pedido mínimo de ese canal
+            if monto < c['min_order']["Amount"]:
+                c['min_order'] = pedido_actual
+            elif monto == c['min_order']["Amount"] and precio < c['min_order']["Price_per_Box"]:
+                c['min_order'] = pedido_actual
+                
+            # Criterio de desempate para pedido máximo de ese canal
+            if monto > c['max_order']["Amount"]:
+                c['max_order'] = pedido_actual
+            elif monto == c['max_order']["Amount"] and precio < c['max_order']["Price_per_Box"]:
+                c['max_order'] = pedido_actual
+
+    if N == 0:
+        return pop_time, 0, None, None, {}
+
+    Canal_mas_usado = max(canales.items(), key=lambda x: x[1]['count'])
+    Canal_mas_recaudador = max(canales.items(), key=lambda x: x[1]['total_amt'])
+    end_time = get_time()
+    pop_time = delta_time(start_time, end_time)
+
+    return pop_time, N, Canal_mas_usado, Canal_mas_recaudador, canales
 
 
 
