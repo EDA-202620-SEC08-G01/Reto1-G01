@@ -1,4 +1,8 @@
 import sys
+default_limit = 1000 
+sys.setrecursionlimit(default_limit*10) 
+import App.logic as logic
+from tabulate import tabulate
 
 
 def new_logic():
@@ -26,7 +30,6 @@ def load_data(control):
     #TODO: Realizar la carga de datos
     pass
 
-
 def print_data(control, id):
     """
         Función que imprime un dato dado su ID
@@ -41,15 +44,35 @@ def print_req_1(control):
     # TODO: Imprimir el resultado del requerimiento 1
     pass
 
-
 def print_req_2(control):
     """
         Función que imprime la solución del Requerimiento 2 en consola
     """
-    # TODO: Imprimir el resultado del requerimiento 2
-    pass
+    precio_minimo = float(input("Ingrese el precio mínimo del rango: "))
+    precio_maximo = float(input("Ingrese el precio máximo del rango: "))
+    
+    catalog = load_data(control)
+    respuestas = logic.req_2(precio_minimo, precio_maximo, catalog)
+    
+    print("\n" + "="*50)
+    print("RESULTADOS DEL REQUERIMIENTO 2")
+    print("="*50)
+    print("Tiempo de ejecución: ", round(respuestas[0], 3), " ms")
+    print("Cantidad de pedidos en el rango: ", round(respuestas[1], 3))
+    print("Promedio del porcentaje de descuento: ", round(respuestas[2], 3), "%")
+    print("Promedio del gasto en marketing: $", round(respuestas[3], 3))
+    print("Promedio del precio por caja: $", round(respuestas[4], 3), "\n")
 
-
+    headers = ["Criterio", "Producto", "País", "Canal", "Fecha Pedido", "Precio/Caja", "Monto Total"]
+    
+    tabla = [
+        ["Más Reciente", *respuestas[5:11]],
+        ["Mayor Monto",  *respuestas[11:17]],
+        ["Menor Monto",  *respuestas[17:23]]
+    ]
+    
+    print(tabulate(tabla, headers=headers, tablefmt="grid"))
+    
 def print_req_3(control):
     """
         Función que imprime la solución del Requerimiento 3 en consola

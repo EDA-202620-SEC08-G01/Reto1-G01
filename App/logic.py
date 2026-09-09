@@ -1,5 +1,6 @@
 import time
 import csv
+csv.field_size_limit(2147483647)
 import os
 from DataStructures.List import array_list as al
 from DataStructures.List import liststructure as lt
@@ -70,15 +71,88 @@ def req_1(catalog):
     pass
 
 
-def req_2(catalog):
+def req_2(precio_minimo, precio_maximo, catalog):
     """
     Retorna el resultado del requerimiento 2
     """
     # TODO: Modificar el requerimiento 2
-    pass
+    start_time = get_time()
+    cantidad_pedidos = 0
+    suma_discount_pct = 0
+    suma_marketing_spend = 0
+    suma_prices_per_box = 0
+    
+    pos_mayor_order_date = None
+    pos_menor_amount = None
+    pos_mayor_amount = None
+    
+    size = data_structure.size(catalog["Price_per_Box"])
+    
+    for i in range(size):
+        precio = data_structure.get_element(catalog["Price_per_Box"], i)
+        
+        if precio_minimo <= precio <= precio_maximo:
+            cantidad_pedidos += 1
+            suma_prices_per_box += precio
+            
+            order_date = data_structure.get_element(catalog["Order_Date"], i)
+            amount = data_structure.get_element(catalog["Amount"], i)
+            
+            suma_discount_pct += data_structure.get_element(catalog["Discount_Pct"], i)
+            suma_marketing_spend += data_structure.get_element(catalog["Marketing_Spend"], i)
+            
+            if pos_mayor_order_date is None or order_date > data_structure.get_element(catalog["Order_Date"], pos_mayor_order_date):
+                pos_mayor_order_date = i
+                
+            if order_date == data_structure.get_element(catalog["Order_Date"], pos_mayor_order_date):
+                if amount > data_structure.get_element(catalog["Amount"], pos_mayor_order_date):
+                    pos_mayor_order_date = i
+            
+            if pos_menor_amount is None or amount < data_structure.get_element(catalog["Amount"], pos_menor_amount):
+                pos_menor_amount = i
+
+            if pos_mayor_amount is None or amount > data_structure.get_element(catalog["Amount"], pos_mayor_amount):
+                pos_mayor_amount = i
+
+            if amount == data_structure.get_element(catalog["Amount"], pos_mayor_amount):
+                if precio < data_structure.get_element(catalog["Price_per_Box"], pos_mayor_amount):
+                    pos_mayor_amount = i
+            if amount == data_structure.get_element(catalog["Amount"], pos_menor_amount):
+                if precio < data_structure.get_element(catalog["Price_per_Box"], pos_menor_amount):
+                    pos_menor_amount = i
+                    
+    promedio_discount_pct = suma_discount_pct / cantidad_pedidos if cantidad_pedidos > 0 else 0
+    promedio_marketing_spend = suma_marketing_spend / cantidad_pedidos if cantidad_pedidos > 0 else 0
+    promedio_prices_per_box = suma_prices_per_box / cantidad_pedidos if cantidad_pedidos > 0 else 0
+    
+    producto_mayor_order_date = data_structure.get_element(catalog["Product"], pos_mayor_order_date) if pos_mayor_order_date is not None else None
+    pais_mayor_order_date = data_structure.get_element(catalog["Country"], pos_mayor_order_date) if pos_mayor_order_date is not None else None
+    canal_mayor_order_date = data_structure.get_element(catalog["Channel"], pos_mayor_order_date) if pos_mayor_order_date is not None else None
+    fecha_mayor_order_date = data_structure.get_element(catalog["Order_Date"], pos_mayor_order_date) if pos_mayor_order_date is not None else None
+    precio_caja_mayor_order_date = data_structure.get_element(catalog["Price_per_Box"], pos_mayor_order_date) if pos_mayor_order_date is not None else None
+    monto_mayor_order_date = data_structure.get_element(catalog["Amount"], pos_mayor_order_date) if pos_mayor_order_date is not None else None
+
+    producto_mayor_amount = data_structure.get_element(catalog["Product"], pos_mayor_amount) if pos_mayor_amount is not None else None
+    pais_mayor_amount = data_structure.get_element(catalog["Country"], pos_mayor_amount) if pos_mayor_amount is not None else None
+    canal_mayor_amount = data_structure.get_element(catalog["Channel"], pos_mayor_amount) if pos_mayor_amount is not None else None
+    fecha_mayor_amount = data_structure.get_element(catalog["Order_Date"], pos_mayor_amount) if pos_mayor_amount is not None else None
+    precio_caja_mayor_amount = data_structure.get_element(catalog["Price_per_Box"], pos_mayor_amount) if pos_mayor_amount is not None else None
+    monto_mayor_amount = data_structure.get_element(catalog["Amount"], pos_mayor_amount) if pos_mayor_amount is not None else None
+
+    producto_menor_amount = data_structure.get_element(catalog["Product"], pos_menor_amount) if pos_menor_amount is not None else None
+    pais_menor_amount = data_structure.get_element(catalog["Country"], pos_menor_amount) if pos_menor_amount is not None else None
+    canal_menor_amount = data_structure.get_element(catalog["Channel"], pos_menor_amount) if pos_menor_amount is not None else None
+    fecha_menor_amount = data_structure.get_element(catalog["Order_Date"], pos_menor_amount) if pos_menor_amount is not None else None
+    precio_caja_menor_amount = data_structure.get_element(catalog["Price_per_Box"], pos_menor_amount) if pos_menor_amount is not None else None
+    monto_menor_amount = data_structure.get_element(catalog["Amount"], pos_menor_amount) if pos_menor_amount is not None else None
+
+    end_time = get_time()
+    tiempo_ejecucion = delta_time(start_time, end_time)
+    
+    return (tiempo_ejecucion, cantidad_pedidos, promedio_discount_pct, promedio_marketing_spend, promedio_prices_per_box, producto_mayor_order_date, pais_mayor_order_date, canal_mayor_order_date, fecha_mayor_order_date, precio_caja_mayor_order_date, monto_mayor_order_date, producto_mayor_amount, pais_mayor_amount, canal_mayor_amount, fecha_mayor_amount, precio_caja_mayor_amount, monto_mayor_amount, producto_menor_amount, pais_menor_amount, canal_menor_amount, fecha_menor_amount, precio_caja_menor_amount, monto_menor_amount)
 
 
-def req_3(catalog, Contry, Channel):
+def req_3(catalog, Country, Channel):
     """
     Retorna el resultado del requerimiento 3
     """
@@ -99,7 +173,7 @@ def req_3(catalog, Contry, Channel):
         pais = data_structure.get_element(catalog["Country"], i)
         canal = data_structure.get_element(catalog["Channel"], i)
         
-        if pais == Contry and canal == Channel:
+        if pais == Country and canal == Channel:
             N += 1
             
             precio = float(data_structure.get_element(catalog["Price_per_Box"], i))
