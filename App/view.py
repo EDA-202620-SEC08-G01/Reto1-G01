@@ -1,7 +1,8 @@
 import sys
-default_limit = 1000 
+default_limit = 1000
 sys.setrecursionlimit(default_limit*10) 
-import App.logic as logic
+
+from App import logic
 from tabulate import tabulate
 
 
@@ -10,7 +11,8 @@ def new_logic():
         Se crea una instancia del controlador
     """
     #TODO: Llamar la función de la lógica donde se crean las estructuras de datos
-    pass
+    control = logic.new_logic()
+    return control
 
 def print_menu():
     print("Bienvenido")
@@ -93,8 +95,31 @@ def print_req_5(control):
     """
         Función que imprime la solución del Requerimiento 5 en consola
     """
-    # TODO: Imprimir el resultado del requerimiento 5
-    pass
+    filtro = input("Ingrese el tipo de filtro (MAYOR o MENOR): ").strip().upper()
+    producto = input("Ingrese el nombre del producto: ").strip()
+    fecha_inicial = input("Ingrese la fecha inicial (AAAA-MM-DD): ").strip()
+    fecha_final = input("Ingrese la fecha final (AAAA-MM-DD): ").strip()
+    
+    catalog = load_data(control)
+    respuestas = logic.req_5(catalog, filtro, producto, fecha_inicial, fecha_final)
+    
+    print("\n" + "="*50)
+    print("RESULTADOS DEL REQUERIMIENTO 5")
+    print("="*50)
+    print("Tiempo de ejecución:", respuestas[0], "ms")
+    print("Filtro aplicado:", filtro)
+    print("Cantidad de pedidos encontrados:", respuestas[1])
+    print("Precio promedio por caja:", respuestas[2])
+    print("Promedio de cajas enviadas:", respuestas[3])
+    print("Promedio de inversión en mercadeo:", respuestas[4])
+    
+    print("\n--- DETALLE DEL PEDIDO RESULTANTE ---")
+    print("Precio por caja:", respuestas[5])
+    print("Cajas enviadas:", respuestas[6])
+    print("Monto total:", respuestas[7])
+    print("Canal:", respuestas[8])
+    print("Fecha del pedido:", respuestas[9])
+    print("Inversión en mercadeo:", respuestas[10])
 
 
 def print_req_6(control):
@@ -135,7 +160,7 @@ def main():
         elif int(inputs) == 5:
             print_req_5(control)
 
-        elif int(inputs) == 5:
+        elif int(inputs) == 6:
             print_req_6(control)
 
         elif int(inputs) == 7:

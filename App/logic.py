@@ -1,48 +1,23 @@
 import time
+
 import csv
 csv.field_size_limit(2147483647)
+
 import os
+
 from DataStructures.List import array_list as al
-from DataStructures.List import liststructure as lt
+from DataStructures.List import single_linked_list as sl
 
 csv.field_size_limit(2147483647)
 
 data_dir = os.path.dirname(os.path.realpath('__file__')) + '/Data/GoodReads'
 
-def new_logic(user_data_structure):
-    
-    global data_structure
-    
-    if user_data_structure == "1":
-        data_structure = al
-    else:
-        data_structure = lt
-        
-    pedidos = {"Order_ID": None,
-               "Product": None,
-               "Country": None,
-               "Channel": None,
-               "Order_Date": None,
-               "Discount_Pct": None,
-               "Price_per_Box": None,
-               "Marketing_Spend": None,
-               "Boxes_Shipped": None,
-               "Amount": None}
-    
-    pedidos["Order_ID"] = lt.new_ilst()
-    pedidos["Product"] = lt.new_ilst()
-    pedidos["Country"] = lt.new_ilst()
-    pedidos["Channel"] = lt.new_ilst()
-    pedidos["Order_Date"] = lt.new_ilst()
-    pedidos["Discount_Pct"] = lt.new_ilst()
-    pedidos["Price_per_Box"] = lt.new_ilst()
-    pedidos["Marketing_Spend"] = lt.new_ilst()
-    pedidos["Boxes_Shipped"] = lt.new_ilst()
-    pedidos["Amount"] = lt.new_ilst()
-    
+def new_logic():
     
     #TODO: Llama a las funciónes de creación de las estructuras de datos
-    return pedidos
+    
+    catalog = {"array": al.new_list(), "single_linked": sl.new_list()}
+    return catalog
 
 
 # Funciones para la carga de datos
@@ -86,65 +61,67 @@ def req_2(precio_minimo, precio_maximo, catalog):
     pos_menor_amount = None
     pos_mayor_amount = None
     
-    size = data_structure.size(catalog["Price_per_Box"])
+    catalog = catalog["array"]
+    
+    size = al.size(catalog["Price_per_Box"])
     
     for i in range(size):
-        precio = data_structure.get_element(catalog["Price_per_Box"], i)
+        precio = al.get_element(catalog["Price_per_Box"], i)
         
         if precio_minimo <= precio <= precio_maximo:
             cantidad_pedidos += 1
             suma_prices_per_box += precio
             
-            order_date = data_structure.get_element(catalog["Order_Date"], i)
-            amount = data_structure.get_element(catalog["Amount"], i)
+            order_date = al.get_element(catalog["Order_Date"], i)
+            amount = al.get_element(catalog["Amount"], i)
             
-            suma_discount_pct += data_structure.get_element(catalog["Discount_Pct"], i)
-            suma_marketing_spend += data_structure.get_element(catalog["Marketing_Spend"], i)
+            suma_discount_pct += al.get_element(catalog["Discount_Pct"], i)
+            suma_marketing_spend += al.get_element(catalog["Marketing_Spend"], i)
             
-            if pos_mayor_order_date is None or order_date > data_structure.get_element(catalog["Order_Date"], pos_mayor_order_date):
+            if pos_mayor_order_date is None or order_date > al.get_element(catalog["Order_Date"], pos_mayor_order_date):
                 pos_mayor_order_date = i
                 
-            if order_date == data_structure.get_element(catalog["Order_Date"], pos_mayor_order_date):
-                if amount > data_structure.get_element(catalog["Amount"], pos_mayor_order_date):
+            if order_date == al.get_element(catalog["Order_Date"], pos_mayor_order_date):
+                if amount > al.get_element(catalog["Amount"], pos_mayor_order_date):
                     pos_mayor_order_date = i
             
-            if pos_menor_amount is None or amount < data_structure.get_element(catalog["Amount"], pos_menor_amount):
+            if pos_menor_amount is None or amount < al.get_element(catalog["Amount"], pos_menor_amount):
                 pos_menor_amount = i
 
-            if pos_mayor_amount is None or amount > data_structure.get_element(catalog["Amount"], pos_mayor_amount):
+            if pos_mayor_amount is None or amount > al.get_element(catalog["Amount"], pos_mayor_amount):
                 pos_mayor_amount = i
 
-            if amount == data_structure.get_element(catalog["Amount"], pos_mayor_amount):
-                if precio < data_structure.get_element(catalog["Price_per_Box"], pos_mayor_amount):
+            if amount == al.get_element(catalog["Amount"], pos_mayor_amount):
+                if precio < al.get_element(catalog["Price_per_Box"], pos_mayor_amount):
                     pos_mayor_amount = i
-            if amount == data_structure.get_element(catalog["Amount"], pos_menor_amount):
-                if precio < data_structure.get_element(catalog["Price_per_Box"], pos_menor_amount):
+            if amount == al.get_element(catalog["Amount"], pos_menor_amount):
+                if precio < al.get_element(catalog["Price_per_Box"], pos_menor_amount):
                     pos_menor_amount = i
                     
     promedio_discount_pct = suma_discount_pct / cantidad_pedidos if cantidad_pedidos > 0 else 0
     promedio_marketing_spend = suma_marketing_spend / cantidad_pedidos if cantidad_pedidos > 0 else 0
     promedio_prices_per_box = suma_prices_per_box / cantidad_pedidos if cantidad_pedidos > 0 else 0
     
-    producto_mayor_order_date = data_structure.get_element(catalog["Product"], pos_mayor_order_date) if pos_mayor_order_date is not None else None
-    pais_mayor_order_date = data_structure.get_element(catalog["Country"], pos_mayor_order_date) if pos_mayor_order_date is not None else None
-    canal_mayor_order_date = data_structure.get_element(catalog["Channel"], pos_mayor_order_date) if pos_mayor_order_date is not None else None
-    fecha_mayor_order_date = data_structure.get_element(catalog["Order_Date"], pos_mayor_order_date) if pos_mayor_order_date is not None else None
-    precio_caja_mayor_order_date = data_structure.get_element(catalog["Price_per_Box"], pos_mayor_order_date) if pos_mayor_order_date is not None else None
-    monto_mayor_order_date = data_structure.get_element(catalog["Amount"], pos_mayor_order_date) if pos_mayor_order_date is not None else None
+    producto_mayor_order_date = al.get_element(catalog["Product"], pos_mayor_order_date) if pos_mayor_order_date is not None else None
+    pais_mayor_order_date = al.get_element(catalog["Country"], pos_mayor_order_date) if pos_mayor_order_date is not None else None
+    canal_mayor_order_date = al.get_element(catalog["Channel"], pos_mayor_order_date) if pos_mayor_order_date is not None else None
+    fecha_mayor_order_date = al.get_element(catalog["Order_Date"], pos_mayor_order_date) if pos_mayor_order_date is not None else None
+    precio_caja_mayor_order_date = al.get_element(catalog["Price_per_Box"], pos_mayor_order_date) if pos_mayor_order_date is not None else None
+    monto_mayor_order_date = al.get_element(catalog["Amount"], pos_mayor_order_date) if pos_mayor_order_date is not None else None
 
-    producto_mayor_amount = data_structure.get_element(catalog["Product"], pos_mayor_amount) if pos_mayor_amount is not None else None
-    pais_mayor_amount = data_structure.get_element(catalog["Country"], pos_mayor_amount) if pos_mayor_amount is not None else None
-    canal_mayor_amount = data_structure.get_element(catalog["Channel"], pos_mayor_amount) if pos_mayor_amount is not None else None
-    fecha_mayor_amount = data_structure.get_element(catalog["Order_Date"], pos_mayor_amount) if pos_mayor_amount is not None else None
-    precio_caja_mayor_amount = data_structure.get_element(catalog["Price_per_Box"], pos_mayor_amount) if pos_mayor_amount is not None else None
-    monto_mayor_amount = data_structure.get_element(catalog["Amount"], pos_mayor_amount) if pos_mayor_amount is not None else None
+    producto_mayor_amount = al.get_element(catalog["Product"], pos_mayor_amount) if pos_mayor_amount is not None else None
+    pais_mayor_amount = al.get_element(catalog["Country"], pos_mayor_amount) if pos_mayor_amount is not None else None
+    canal_mayor_amount = al.get_element(catalog["Channel"], pos_mayor_amount) if pos_mayor_amount is not None else None
+    fecha_mayor_amount = al.get_element(catalog["Order_Date"], pos_mayor_amount) if pos_mayor_amount is not None else None
+    precio_caja_mayor_amount = al.get_element(catalog["Price_per_Box"], pos_mayor_amount) if pos_mayor_amount is not None else None
+    monto_mayor_amount = al.get_element(catalog["Amount"], pos_mayor_amount) if pos_mayor_amount is not None else None
 
-    producto_menor_amount = data_structure.get_element(catalog["Product"], pos_menor_amount) if pos_menor_amount is not None else None
-    pais_menor_amount = data_structure.get_element(catalog["Country"], pos_menor_amount) if pos_menor_amount is not None else None
-    canal_menor_amount = data_structure.get_element(catalog["Channel"], pos_menor_amount) if pos_menor_amount is not None else None
-    fecha_menor_amount = data_structure.get_element(catalog["Order_Date"], pos_menor_amount) if pos_menor_amount is not None else None
-    precio_caja_menor_amount = data_structure.get_element(catalog["Price_per_Box"], pos_menor_amount) if pos_menor_amount is not None else None
-    monto_menor_amount = data_structure.get_element(catalog["Amount"], pos_menor_amount) if pos_menor_amount is not None else None
+    producto_menor_amount = al.get_element(catalog["Product"], pos_menor_amount) if pos_menor_amount is not None else None
+    pais_menor_amount = al.get_element(catalog["Country"], pos_menor_amount) if pos_menor_amount is not None else None
+    canal_menor_amount = al.get_element(catalog["Channel"], pos_menor_amount) if pos_menor_amount is not None else None
+    fecha_menor_amount = al.get_element(catalog["Order_Date"], pos_menor_amount) if pos_menor_amount is not None else None
+    precio_caja_menor_amount = al.get_element(catalog["Price_per_Box"], pos_menor_amount) if pos_menor_amount is not None else None
+    monto_menor_amount = al.get_element(catalog["Amount"], pos_menor_amount) if pos_menor_amount is not None else None
 
     end_time = get_time()
     tiempo_ejecucion = delta_time(start_time, end_time)
@@ -209,11 +186,6 @@ def req_3(catalog, Country, Channel):
     pop_time = delta_time(start_time, end_time)
 
     return pop_time, N, Prom_precio, Prom_cajas, Prom_descuento, Prom_marketing, Moda_año, Moda_producto
-    
-    
-    
-
-
 
 def req_4(catalog):
     """
@@ -223,12 +195,71 @@ def req_4(catalog):
     pass
 
 
-def req_5(catalog):
+def req_5(catalog, filtro, producto, fecha_inicial, fecha_final):
     """
     Retorna el resultado del requerimiento 5
     """
     # TODO: Modificar el requerimiento 5
-    pass
+    start_time = get_time()
+    cantidad_pedidos = 0
+    suma_precio = 0
+    suma_cajas = 0
+    suma_inversion_mercado = 0
+    actual = catalog["first"]
+    orden_comparacion = None
+    
+    while actual is not None:
+        current = actual["info"]
+        if current["Product"] == producto and current["Order_Date"] >= fecha_inicial and current["Order_Date"] <= fecha_final:
+            cantidad_pedidos += 1
+            suma_precio += current["Price_per_Box"]
+            suma_cajas += current["Boxes_Shipped"]
+            suma_inversion_mercado += current["Marketing_Spend"]
+            
+            
+            if filtro == "MAYOR":
+                if orden_comparacion is None or current["Amount"] > orden_comparacion["Amount"]:
+                    orden_comparacion = current
+                elif current["Amount"] == orden_comparacion["Amount"] and current["Price_per_Box"] < orden_comparacion["Price_per_Box"]:
+                    orden_comparacion = current     
+            elif filtro == "MENOR":
+                if orden_comparacion is None or current["Amount"] < orden_comparacion["Amount"]:
+                    orden_comparacion = current
+                elif current["Amount"] == orden_comparacion["Amount"] and current["Price_per_Box"] < orden_comparacion["Price_per_Box"]:
+                    orden_comparacion = current
+            else:
+                orden_comparacion = -1  # Valor inválido para el filtro
+
+        actual = actual["next"]
+    
+    if cantidad_pedidos > 0:
+        promedio_precio = suma_precio / cantidad_pedidos
+        promedio_cajas = suma_cajas / cantidad_pedidos
+        promedio_inversion_mercado = suma_inversion_mercado / cantidad_pedidos
+    else:
+        promedio_precio = "Unknown"
+        promedio_cajas = "Unknown"
+        promedio_inversion_mercado = "Unknown"
+        
+    if orden_comparacion != -1:
+        precio_caja = orden_comparacion["Price_per_Box"]
+        cajas_enviadas = orden_comparacion["Boxes_Shipped"]
+        monto_total = orden_comparacion["Amount"]
+        canal = orden_comparacion["Channel"]
+        fecha_pedido = orden_comparacion["Order_Date"]
+        inversion_mercado = orden_comparacion["Marketing_Spend"]
+    else:
+        precio_caja = "Unknown"
+        cajas_enviadas = "Unknown"
+        monto_total = "Unknown"
+        canal = "Unknown"
+        fecha_pedido = "Unknown"
+        inversion_mercado = "Unknown"
+        
+    end_time = get_time()
+    tiempo_ejecucion = delta_time(start_time, end_time)
+    
+    return (tiempo_ejecucion, cantidad_pedidos, promedio_precio, promedio_cajas, promedio_inversion_mercado, precio_caja, cajas_enviadas, monto_total, canal, fecha_pedido, inversion_mercado)
 
 def req_6(catalog, Fecha_inicial, Fecha_final):
     """
