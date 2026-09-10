@@ -34,7 +34,7 @@ The students edit this section to add their names, Uniandes emails, and specify 
 
 1. Juan Sebastián Suárez Santos, j.suarezs2@uniandes.edu.co, Funcionalidad propiedad del estudiante No. 1.
 1. Samuel Rodriguez Romero, s.rodriguez23456712@uniandes.edu.co, Funcionalidad propiedad del estudiante No. 2.
-1. Nicolas Gomez Ayala, nmgomeza1@Uniandes.edu.co, Funcionalidad propiedad del estudiante No. 3.
+1. Nicolas Gomez Ayala, nm.gomeza1@Uniandes.edu.co, Funcionalidad propiedad del estudiante No. 3.
 
 [Back to top](#retos-template)
 
