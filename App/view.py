@@ -103,28 +103,53 @@ def print_req_2(control):
     """
     precio_minimo = float(input("Ingrese el precio mínimo del rango: "))
     precio_maximo = float(input("Ingrese el precio máximo del rango: "))
-    
+
     catalog = load_data(control)
     respuestas = logic.req_2(precio_minimo, precio_maximo, catalog)
-    
+
+    tiempo, cantidad, prom_descuento, prom_marketing, prom_precio, mas_reciente, mayor, menor = respuestas
+
     print("\n" + "="*50)
     print("RESULTADOS DEL REQUERIMIENTO 2")
     print("="*50)
-    print("Tiempo de ejecución: ", round(respuestas[0], 3), " ms")
-    print("Cantidad de pedidos en el rango: ", round(respuestas[1], 3))
-    print("Promedio del porcentaje de descuento: ", round(respuestas[2], 3), "%")
-    print("Promedio del gasto en marketing: $", round(respuestas[3], 3))
-    print("Promedio del precio por caja: $", round(respuestas[4], 3), "\n")
+    print("Tiempo de ejecución:", round(tiempo, 3), "ms")
+    print("Cantidad de pedidos en el rango:", cantidad)
+    print("Promedio del porcentaje de descuento:", round(prom_descuento, 3), "%")
+    print("Promedio del gasto en marketing: $", round(prom_marketing, 3))
+    print("Promedio del precio por caja: $", round(prom_precio, 3))
 
-    headers = ["Criterio", "Producto", "País", "Canal", "Fecha Pedido", "Precio/Caja", "Monto Total"]
-    
-    tabla = [
-        ["Más Reciente", *respuestas[5:11]],
-        ["Mayor Monto",  *respuestas[11:17]],
-        ["Menor Monto",  *respuestas[17:23]]
-    ]
-    
-    print(tabulate(tabla, headers=headers, tablefmt="grid"))
+    print("\n--- Pedido más reciente ---")
+    if mas_reciente is not None:
+        print("Producto:", mas_reciente["Product"])
+        print("País:", mas_reciente["Country"])
+        print("Canal:", mas_reciente["Channel"])
+        print("Fecha:", mas_reciente["Order_Date"])
+        print("Precio por caja:", mas_reciente["Price_per_Box"])
+        print("Monto:", mas_reciente["Amount"])
+    else:
+        print("Unknown")
+
+    print("\n--- Pedido de mayor monto ---")
+    if mayor is not None:
+        print("Producto:", mayor["Product"])
+        print("País:", mayor["Country"])
+        print("Canal:", mayor["Channel"])
+        print("Fecha:", mayor["Order_Date"])
+        print("Precio por caja:", mayor["Price_per_Box"])
+        print("Monto:", mayor["Amount"])
+    else:
+        print("Unknown")
+
+    print("\n--- Pedido de menor monto ---")
+    if menor is not None:
+        print("Producto:", menor["Product"])
+        print("País:", menor["Country"])
+        print("Canal:", menor["Channel"])
+        print("Fecha:", menor["Order_Date"])
+        print("Precio por caja:", menor["Price_per_Box"])
+        print("Monto:", menor["Amount"])
+    else:
+        print("Unknown")
     
 def print_req_3(control):
     """
