@@ -131,7 +131,39 @@ def print_req_3(control):
         Función que imprime la solución del Requerimiento 3 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 3
-    pass
+    print("\n" + "="*40)
+    print("        REQUERIMIENTO 3")
+    print("="*40)
+    
+    # 1. Pedir parámetros al usuario
+    pais = input("Ingrese el País a buscar (ej. United States): ")
+    canal = input("Ingrese el Canal a buscar (ej. Online): ")
+    
+    # 2. Llamar al controlador (Asegúrate que en control.py la función se llame así)
+    # El controlador se encargará de pasarle el catálogo al modelo
+    resultados = control.req_3(pais, canal)
+    
+    # 3. Desempacar y mostrar resultados
+    if resultados:
+        # Extraemos en el mismo orden exacto del return de tu función req_3
+        tiempo, n, p_precio, p_cajas, p_desc, p_mkt, moda_anio, moda_prod = resultados
+        
+        print("\n--- RESULTADOS ---")
+        print(f"Tiempo de ejecución: {tiempo:.4f} ms")
+        
+        if n == 0:
+            print("\nNo se encontraron pedidos para la combinación de país y canal ingresada.")
+        else:
+            print(f"Total de pedidos encontrados (N): {n}")
+            print(f"Promedio Precio por Caja:       ${p_precio:.2f}")
+            print(f"Promedio Cajas Enviadas:        {p_cajas:.2f} cajas")
+            print(f"Promedio Descuento:             {p_desc:.2f}%")
+            print(f"Promedio Inversión Marketing:   ${p_mkt:.2f}")
+            print(f"Año con más ventas (Moda):      {moda_anio}")
+            print(f"Producto más vendido (Moda):    {moda_prod}")
+    else:
+        print("\nError: No se obtuvieron resultados del controlador.")
+    print("="*40)
 
 
 def print_req_4(control):
@@ -178,7 +210,51 @@ def print_req_6(control):
         Función que imprime la solución del Requerimiento 6 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 6
-    pass
+    print("\n" + "="*40)
+    print("        REQUERIMIENTO 6")
+    print("="*40)
+    
+    # 1. Pedir parámetros al usuario
+    start_date = input("Ingrese la Fecha de Inicio (YYYY-MM-DD): ")
+    end_date = input("Ingrese la Fecha de Fin (YYYY-MM-DD): ")
+    
+    # 2. Llamar al controlador
+    resultados = control.req_6(start_date, end_date)
+    
+    # 3. Desempacar y mostrar resultados
+    if resultados:
+        # Extraemos en el orden del return de req_6
+        tiempo, n, canal_usado, canal_recaudador, lista_canales = resultados
+        
+        print("\n--- RESULTADOS GLOBALES ---")
+        print(f"Tiempo de ejecución: {tiempo:.4f} ms")
+        
+        if n == 0:
+            print("\nNo se encontraron pedidos dentro de ese rango de fechas.")
+        else:
+            print(f"Total de pedidos en el rango: {n}")
+            
+            # canal_usado y canal_recaudador son listas con la estructura: 
+            # [nombre_canal, count, total_amt, sum_price, sum_mkt, min_order, max_order]
+            
+            print("\n🏆 CANAL MÁS USADO:")
+            print(f"Nombre: {canal_usado[0]}")
+            print(f"Cantidad de pedidos: {canal_usado[1]}")
+            
+            print("\n💰 CANAL CON MAYOR RECAUDACIÓN:")
+            print(f"Nombre: {canal_recaudador[0]}")
+            print(f"Dinero recaudado: ${canal_recaudador[2]:,.2f}")
+            
+            # Imprimir el detalle del pedido máximo del canal que más recaudó (opcional pero suma puntos visuales)
+            pedido_max = canal_recaudador[6]
+            print(f"\n   -> Detalle de su venta máxima:")
+            print(f"      ID Pedido: {pedido_max['Order_ID']}")
+            print(f"      Producto:  {pedido_max['Product']}")
+            print(f"      Monto:     ${pedido_max['Amount']:,.2f}")
+            
+    else:
+        print("\nError: No se obtuvieron resultados del controlador.")
+    print("="*40)
 
 # Se crea la lógica asociado a la vista
 control = new_logic()
