@@ -494,79 +494,94 @@ def req_5(catalog, filtro, producto, fecha_inicial, fecha_final):
     
     return (tiempo_ejecucion, cantidad_pedidos, promedio_precio, promedio_cajas, promedio_inversion_mercado, precio_caja, cajas_enviadas, monto_total, canal, fecha_pedido, inversion_mercado)
 
-def req_6(catalog, Fecha_inicial, Fecha_final):
+def req_6(catalog, start_date, end_date):
     """
-    Retorna el resultado del requerimiento 6
+    Retorna el resultado del requerimiento 6 usando sl (Single Linked List)
     """
-    # TODO: Modificar el requerimiento 6
     start_time = get_time()
-    tamaño = al.size(catalog["Order_ID"])
+    
+    # 1. Acceder a la lista enlazada correctamente
+    catalog = catalog["single_linked"]
+    
+    # 2. Obtener el tamaño usando la librería sl
+    tamaño = sl.size(catalog)
+    
     N = 0
-    canales = {}
+    info_canales = {}
 
+    # 3. Recorrer usando sl.get_element(catalog, i)
     for i in range(tamaño):
-        fecha = str(al.get_element(catalog["Order_Date"], i))
+        fila = sl.get_element(catalog, i)
+        fecha = fila["Order_Date"]
         
-        if Fecha_inicial <= fecha <= Fecha_final:
+        # Filtrar por el rango de fechas (formato string "YYYY-MM-DD")
+        if start_date <= fecha <= end_date:
             N += 1
-            canal = al.get_element(catalog["Channel"], i)
+            canal = fila["Channel"]
+            amount = fila["Amount"]
             
-            orden = al.get_element(catalog["Order_ID"], i)
-            producto = al.get_element(catalog["Product"], i)
-            pais = al.get_element(catalog["Country"], i)
-            monto = float(al.get_element(catalog["Amount"], i))
-            precio = float(al.get_element(catalog["Price_per_Box"], i))
-            marketing = float(al.get_element(catalog["Marketing_Spend"], i))
-            cajas = int(al.get_element(catalog["Boxes_Shipped"], i))
-            
-            pedido_actual = {
-                "Order_ID": orden,
-                "Product": producto,
-                "Country": pais,
-                "Channel": canal,
-                "Order_Date": fecha,
-                "Price_per_Box": precio,
-                "Boxes_Shipped": cajas,
-                "Amount": monto
-            }
-            
-            if canal not in canales:
-                canales[canal] = {
-                    'count': 0,
-                    'total_amt': 0.0,
-                    'sum_price': 0.0,
-                    'sum_mkt': 0.0,
-                    'min_order': pedido_actual,
-                    'max_order': pedido_actual
+            # Si el canal no existe en el diccionario, lo inicializamos
+            if canal not in info_canales:
+                info_canales[canal] = {
+                    "Nombre": canal,
+                    "Total_Pedidos": 0,
+                    "Total_Recaudo": 0,
+                    "Suma_Precio": 0,
+                    "Suma_Marketing": 0,
+                    "Pedido_mas_costoso": None,
+                    "Pedido_mas_barato": None
                 }
             
-            c = canales[canal]
-            c['count'] += 1
-            c['total_amt'] += monto
-            c['sum_price'] += precio
-            c['sum_mkt'] += marketing
+            # Actualizar acumuladores del canal
+            c_data = info_canales[canal]
+            c_data["Total_Pedidos"] += 1
+            c_data["Total_Recaudo"] += amount
+            c_data["Suma_Precio"] += fila["Price_per_Box"]
+            c_data["Suma_Marketing"] += fila["Marketing_Spend"]
             
-            # Criterio de desempate para pedido mínimo de ese canal
-            if monto < c['min_order']["Amount"]:
-                c['min_order'] = pedido_actual
-            elif monto == c['min_order']["Amount"] and precio < c['min_order']["Price_per_Box"]:
-                c['min_order'] = pedido_actual
-                
-            # Criterio de desempate para pedido máximo de ese canal
-            if monto > c['max_order']["Amount"]:
-                c['max_order'] = pedido_actual
-            elif monto == c['max_order']["Amount"] and precio < c['max_order']["Price_per_Box"]:
-                c['max_order'] = pedido_actual
+            # Evaluar pedido más costoso (por Amount)
+            if c_data["Pedido_mas_costoso"] is None or amount > c_data["Pedido_mas_costoso"]["Amount"]:
+                c_data["Pedido_mas_costoso"] = fila
+            
+            # Evaluar pedido más barato (por Amount)
+            if c_data["Pedido_mas_barato"] is None or amount < c_data["Pedido_mas_barato"]["Amount"]:
+                c_data["Pedido_mas_barato"] = fila
 
-    if N == 0:
-        return pop_time, 0, None, None, {}
+    # 4. Procesar estadísticas globales a partir de los canales
+    canal_usado = None
+    canal_recaudador = None
+    detalle_salida = {}
+    
+    for canal, datos in info_canales.items():
+        total_peds = datos["Total_Pedidos"]
+        
+        # Guardar promedios y datos para el formato de la vista
+        detalle_salida[canal] = {
+            "Precio_promedio": datos["Suma_Precio"] / total_peds if total_peds > 0 else 0,
+            "Promedio_marketing": datos["Suma_Marketing"] / total_peds if total_peds > 0 else 0,
+            "Pedido_mas_costoso": datos["Pedido_mas_costoso"],
+            "Pedido_mas_barato": datos["Pedido_mas_barato"]
+        }
+        
+        # Buscar el canal más usado (mayor número de pedidos)
+        if canal_usado is None or total_peds > canal_usado["Total_Pedidos"]:
+            canal_usado = datos
+            
+        # Buscar el canal con mayor recaudación
+        if canal_recaudador is None or datos["Total_Recaudo"] > canal_recaudador["Total_Recaudo"]:
+            canal_recaudador = datos
 
-    Canal_mas_usado = max(canales.items(), key=lambda x: x[1]['count'])
-    Canal_mas_recaudador = max(canales.items(), key=lambda x: x[1]['total_amt'])
+    # Valores por defecto si no hay datos en el rango
+    if canal_usado is None:
+        canal_usado = {"Nombre": "Ninguno", "Total_Pedidos": 0, "Total_Recaudo": 0}
+    if canal_recaudador is None:
+        canal_recaudador = {"Nombre": "Ninguno", "Total_Pedidos": 0, "Total_Recaudo": 0}
+
     end_time = get_time()
-    pop_time = delta_time(start_time, end_time)
+    tiempo_ejecucion = delta_time(start_time, end_time)
 
-    return pop_time, N, Canal_mas_usado, Canal_mas_recaudador, canales
+    # 5. Retornar en el orden exacto que espera print_req_6 en view.py
+    return (tiempo_ejecucion, N, canal_usado, canal_recaudador, detalle_salida)
 
 
 
