@@ -79,7 +79,9 @@ def req_1(catalog, nom_producto):
     """
     Tiempo_inicial = get_time()
     
-    n = al.size(catalog["Product"])
+    catalog = catalog["array"]
+    
+    n = al.size(catalog)
     
     contador = 0
     sum_price = 0; min_price = None; max_price = None
@@ -92,13 +94,15 @@ def req_1(catalog, nom_producto):
     less_amount = None
     ubicacion_less_amount = None
     
-    for i in range (1, n+1): #Del primer elemento hasta el último, sabiendo que el for excluye el ultimo del rango
-        
-        if nom_producto == al.get_element(catalog["Product"], i):
+    for i in range (0, n):
+
+        fila = al.get_element(catalog, i)
+
+        if nom_producto == fila["Product"]:
             
             contador+=1
         
-            price = float(al.get_element(catalog["Price_per_Box"],i))
+            price = fila["Price_per_Box"]
             sum_price += price
             if min_price == None:
                 min_price = price
@@ -112,7 +116,7 @@ def req_1(catalog, nom_producto):
                 
               
                 
-            discount = float(al.get_element(catalog["Discount_Pct"],i))
+            discount = fila["Discount_Pct"]
             sum_discount+= discount
             if min_discount == None:
                 min_discount = discount
@@ -125,7 +129,7 @@ def req_1(catalog, nom_producto):
                 max_discount = max(max_discount,discount)
                 
             
-            boxes = float(al.get_element(catalog["Boxes_Shipped"],i))
+            boxes = fila["Boxes_Shipped"]
             sum_boxes+= boxes
             if min_boxes == None:
                 min_boxes = boxes
@@ -139,7 +143,7 @@ def req_1(catalog, nom_producto):
 
 
 
-            marketing = float(al.get_element(catalog["Marketing_Spend"],i))
+            marketing = fila["Marketing_Spend"]
             sum_marketing+= marketing
             if min_marketing == None:
                 min_marketing = marketing
@@ -154,7 +158,7 @@ def req_1(catalog, nom_producto):
                 
             
             
-            fecha = al.get_element(catalog["Order_Date"],i)
+            fecha = fila["Order_Date"]
             año = fecha[:4]
             if año in conteo_años:
                 conteo_años[año] = conteo_años[año] + 1 
@@ -162,7 +166,7 @@ def req_1(catalog, nom_producto):
                 conteo_años[año] = 1
             
             
-            amount = float(al.get_element(catalog["Amount"],i))
+            amount = fila["Amount"]
             if (max_amount == None) or (amount > max_amount):
                 max_amount = amount
                 ubicacion_max_amount = i
@@ -183,17 +187,19 @@ def req_1(catalog, nom_producto):
             max_conteo = conteo_años[año]
             año_top = año
             
-    a = al.get_element(catalog["Order_ID"],ubicacion_max_amount)
-    b = al.get_element(catalog["Country"],ubicacion_max_amount)
-    c = al.get_element(catalog["Order_Date"],ubicacion_max_amount) 
-    d = al.get_element(catalog["Price_per_Box"],ubicacion_max_amount) 
-    
+    fila_mayor = al.get_element(catalog, ubicacion_max_amount)
+    a = fila_mayor["Order_ID"]
+    b = fila_mayor["Country"]
+    c = fila_mayor["Order_Date"]
+    d = fila_mayor["Price_per_Box"]
+
     info_mayor_amount = "Mayor amount = "+str(a)+" "+str(b)+" "+str(c)+" "+str(d)+" "+str(max_amount)
     
-    e = al.get_element(catalog["Order_ID"],ubicacion_less_amount)
-    f = al.get_element(catalog["Country"],ubicacion_less_amount)
-    g = al.get_element(catalog["Order_Date"],ubicacion_less_amount) 
-    h = al.get_element(catalog["Price_per_Box"],ubicacion_less_amount) 
+    fila_menor = al.get_element(catalog, ubicacion_less_amount)
+    e = fila_menor["Order_ID"]
+    f = fila_menor["Country"]
+    g = fila_menor["Order_Date"]
+    h = fila_menor["Price_per_Box"]
     
     info_menor_amount = "Menor amount = "+str(e)+" "+str(f)+" "+str(g)+" "+str(h)
     
@@ -358,6 +364,8 @@ def req_4(catalog, producto, pais):
     # TODO: Modificar el requerimiento 4
     inicio = get_time()
     
+    catalog = catalog["single_linked"]
+    
     total_pedidos = 0
     prom_price = 0
     prom_discount = 0
@@ -367,27 +375,29 @@ def req_4(catalog, producto, pais):
     top_amount_1 = None
     top_amount_2 = None
     
-    n = sl.size(catalog["Product"])
-    
-    for i in range(1, n+1):
-        if (sl.get_element(catalog["Product"], i) == producto) and (sl.get_element(catalog["Country"], i) == pais):
+    nodo_actual = catalog["first"] 
+
+    while nodo_actual is not None:
+        fila = nodo_actual["info"]
+        
+        if (fila["Product"] == producto) and (fila["Country"] == pais):
             
-            total_pedidos+=1
+            total_pedidos += 1
             
-            price = float(sl.get_element(catalog["Price_per_Box"], i))
-            discount = float(sl.get_element(catalog["Discount_Pct"], i))
-            marketing = float(sl.get_element(catalog["Marketing_Spend"], i))
-            boxes = float(sl.get_element(catalog["Boxes_Shipped"], i))
+            price = float(fila["Price_per_Box"])
+            discount = float(fila["Discount_Pct"])
+            marketing = float(fila["Marketing_Spend"])
+            boxes = float(fila["Boxes_Shipped"])
             
             prom_price += price
             prom_discount += discount
             prom_marketing += marketing
             prom_boxes += boxes
             
-            amount = float(sl.get_element(catalog["Amount"], i))
-            order_id = sl.get_element(catalog["Order_ID"], i)
-            channel = sl.get_element(catalog["Channel"], i)
-            fecha = sl.get_element(catalog["Order_Date"], i)
+            amount = float(fila["Amount"])
+            order_id = fila["Order_ID"]
+            channel = fila["Channel"]
+            fecha = fila["Order_Date"]
 
 
             
@@ -395,7 +405,8 @@ def req_4(catalog, producto, pais):
                        "marketing": marketing,
                        "order_id": order_id,
                        "channel": channel,
-                       "fecha": fecha
+                       "fecha": fecha,
+                        "boxes": boxes
                     }
             
             if top_amount_1 is None:
@@ -410,7 +421,9 @@ def req_4(catalog, producto, pais):
             
             elif (amount > top_amount_2["amount"]) or ((amount == top_amount_2["amount"]) and (marketing < top_amount_2["marketing"])) or ((amount == top_amount_2["amount"]) and (marketing == top_amount_2["marketing"]) and (order_id < top_amount_2["order_id"])):
                 top_amount_2 = posible
-            
+        
+        nodo_actual = nodo_actual["next"]
+        
     if total_pedidos == 0:
         return "No hubo pedidos con esa combinación"
     

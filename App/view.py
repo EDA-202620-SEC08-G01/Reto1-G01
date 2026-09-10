@@ -91,11 +91,30 @@ def print_data(control, id):
         print("Unknown")
 
 def print_req_1(control):
-    """
-        Función que imprime la solución del Requerimiento 1 en consola
-    """
-    # TODO: Imprimir el resultado del requerimiento 1
-    pass
+    
+    nom_producto = input("Ingrese el nombre del producto: ")
+    respuesta = logic.req_1(control, nom_producto)
+    
+    if type(respuesta) == str:
+        print(respuesta)
+        return
+        
+    (tiempo, contador, prom_price, max_price, min_price,
+     prom_discount, max_discount, min_discount,
+     prom_boxes, max_boxes, min_boxes,
+     prom_marketing, max_marketing, min_marketing,
+     año_top, info_mayor_amount, info_menor_amount) = respuesta
+    
+    print("\n--- Resultados del Requerimiento 1 ---")
+    print("Tiempo de ejecución: " + str(round(tiempo, 2)) + " ms")
+    print("Total de pedidos del producto '" + nom_producto + "': " + str(contador))
+    print("Price_per_Box -> Promedio: " + str(round(prom_price, 2)) + ", Mínimo: " + str(min_price) + ", Máximo: " + str(max_price))
+    print("Discount_Pct -> Promedio: " + str(round(prom_discount, 2)) + ", Mínimo: " + str(min_discount) + ", Máximo: " + str(max_discount))
+    print("Boxes_Shipped -> Promedio: " + str(round(prom_boxes, 2)) + ", Mínimo: " + str(min_boxes) + ", Máximo: " + str(max_boxes))
+    print("Marketing_Spend -> Promedio: " + str(round(prom_marketing, 2)) + ", Mínimo: " + str(min_marketing) + ", Máximo: " + str(max_marketing))
+    print("Año con más pedidos: " + str(año_top))
+    print(info_mayor_amount)
+    print(info_menor_amount)
 
 def print_req_2(control):
     """
@@ -138,8 +157,38 @@ def print_req_4(control):
     """
         Función que imprime la solución del Requerimiento 4 en consola
     """
-    # TODO: Imprimir el resultado del requerimiento 4
-    pass
+    producto = input("Ingrese el nombre del producto: ")
+    pais = input("Ingrese el país: ")
+    
+    respuesta = logic.req_4(control, producto, pais)
+    
+    if type(respuesta) == str:
+        print(respuesta)
+        return
+        
+    (tiempo, prom_price, prom_discount, prom_marketing, prom_boxes,
+     top_amount_1, top_amount_2) = respuesta
+    
+    print("\n--- Resultados del Requerimiento 4 ---")
+    print("Tiempo de ejecución: " + str(round(tiempo, 2)) + " ms")
+    print("Price_per_Box promedio: " + str(round(prom_price, 2)))
+    print("Discount_Pct promedio: " + str(round(prom_discount, 2)))
+    print("Marketing_Spend promedio: " + str(round(prom_marketing, 2)))
+    print("Boxes_Shipped promedio: " + str(round(prom_boxes, 2)))
+    
+    print("\nPedido de mayor Amount:")
+    print(" Order_ID: " + str(top_amount_1['order_id']) + ", Channel: " + str(top_amount_1['channel']) + 
+          ", Order_Date: " + str(top_amount_1['fecha']) + ", Boxes_Shipped: " + str(top_amount_1['boxes']) + 
+          ", Amount: " + str(top_amount_1['amount']))
+    
+    if top_amount_2 is not None:
+        print("Segundo pedido de mayor Amount:")
+        print(" Order_ID: " + str(top_amount_2['order_id']) + ", Channel: " + str(top_amount_2['channel']) + 
+              ", Order_Date: " + str(top_amount_2['fecha']) + ", Boxes_Shipped: " + str(top_amount_2['boxes']) + 
+              ", Amount: " + str(top_amount_2['amount']))
+    else:
+        print("No hubo un segundo pedido que cumpliera el filtro.")
+    
 
 
 def print_req_5(control):
