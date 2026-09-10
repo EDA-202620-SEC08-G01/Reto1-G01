@@ -266,9 +266,10 @@ def req_3(catalog, Country, Channel):
     Retorna el resultado del requerimiento 3
     """
     # TODO: Modificar el requerimiento 3
-    #pass
+    
+    catalog=catalog["Array"]
     start_time = get_time()
-    tamaño=data_structure.size(catalog["Order_ID"])
+    tamaño=sl.size(catalog["Order_ID"])
     N=0
     suma_precio=0
     suma_descuento=0
@@ -279,26 +280,26 @@ def req_3(catalog, Country, Channel):
     años = {}
 
     for i in range(tamaño):
-        pais = data_structure.get_element(catalog["Country"], i)
-        canal = data_structure.get_element(catalog["Channel"], i)
+        pais = al.get_element(catalog["Country"], i)
+        canal = al.get_element(catalog["Channel"], i)
         
         if pais == Country and canal == Channel:
             N += 1
             
-            precio = float(data_structure.get_element(catalog["Price_per_Box"], i))
-            descuento = float(data_structure.get_element(catalog["Discount_Pct"], i))
-            marketing = float(data_structure.get_element(catalog["Marketing_Spend"], i))
-            cajas = int(data_structure.get_element(catalog["Boxes_Shipped"], i))
+            precio = float(al.get_element(catalog["Price_per_Box"], i))
+            descuento = float(al.get_element(catalog["Discount_Pct"], i))
+            marketing = float(al.get_element(catalog["Marketing_Spend"], i))
+            cajas = int(al.get_element(catalog["Boxes_Shipped"], i))
             
             suma_precio += precio
             suma_descuento += descuento
             suma_marketing += marketing
             suma_cajas += cajas
             
-            prod = data_structure.get_element(catalog["Product"], i)
+            prod = al.get_element(catalog["Product"], i)
             productos[prod] = productos.get(prod, 0) + 1
             
-            date_val = str(data_structure.get_element(catalog["Order_Date"], i))
+            date_val = str(al.get_element(catalog["Order_Date"], i))
             year = date_val[:4]
             años[year] = años.get(year, 0) + 1
 
@@ -467,23 +468,24 @@ def req_6(catalog, Fecha_inicial, Fecha_final):
     """
     # TODO: Modificar el requerimiento 6
     start_time = get_time()
-    tamaño = data_structure.size(catalog["Order_ID"])
+    tamaño = al.size(catalog["Order_ID"])
     N = 0
     canales = {}
 
     for i in range(tamaño):
-        fecha = str(data_structure.get_element(catalog["Order_Date"], i))
+        fecha = str(al.get_element(catalog["Order_Date"], i))
+        
         if Fecha_inicial <= fecha <= Fecha_final:
             N += 1
-            canal = data_structure.get_element(catalog["Channel"], i)
+            canal = al.get_element(catalog["Channel"], i)
             
-            orden = data_structure.get_element(catalog["Order_ID"], i)
-            producto = data_structure.get_element(catalog["Product"], i)
-            pais = data_structure.get_element(catalog["Country"], i)
-            monto = float(data_structure.get_element(catalog["Amount"], i))
-            precio = float(data_structure.get_element(catalog["Price_per_Box"], i))
-            marketing = float(data_structure.get_element(catalog["Marketing_Spend"], i))
-            cajas = int(data_structure.get_element(catalog["Boxes_Shipped"], i))
+            orden = al.get_element(catalog["Order_ID"], i)
+            producto = al.get_element(catalog["Product"], i)
+            pais = al.get_element(catalog["Country"], i)
+            monto = float(al.get_element(catalog["Amount"], i))
+            precio = float(al.get_element(catalog["Price_per_Box"], i))
+            marketing = float(al.get_element(catalog["Marketing_Spend"], i))
+            cajas = int(al.get_element(catalog["Boxes_Shipped"], i))
             
             pedido_actual = {
                 "Order_ID": orden,
