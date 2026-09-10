@@ -263,14 +263,14 @@ def req_2(precio_minimo, precio_maximo, catalog):
 
 def req_3(catalog, Country, Channel):
     """
-    Retorna el resultado del requerimiento 3
+    Retorna el resultado del requerimiento 3 usando sl (Single Linked List)
     """
     start_time = get_time()
     
-    # 1. Extraer el array correctamente
-    catalog = catalog["array"]
+    # 1. Acceder a la lista enlazada
+    catalog = catalog["single_linked"]
     
-    # 2. Obtener el tamaño usando la librería de arreglos
+    # 2. Obtener el tamaño usando la librería sl
     tamaño = sl.size(catalog)
     
     N = 0
@@ -282,7 +282,7 @@ def req_3(catalog, Country, Channel):
     conteo_productos = {}
     conteo_anios = {}
 
-    # 3. Recorrer el arreglo elemento por elemento
+    # 3. Recorrer usando sl.get_element(catalog, i)
     for i in range(tamaño):
         fila = sl.get_element(catalog, i)
         
@@ -298,10 +298,33 @@ def req_3(catalog, Country, Channel):
             prod = fila["Product"]
             conteo_productos[prod] = conteo_productos.get(prod, 0) + 1
             
-            # Conteo para el año con más pedidos (Extrayendo el año de 'Order_Date', ej: "2022-01-22" -> "2022")
+            # Conteo para el año con más pedidos
             fecha = fila["Order_Date"]
             anio = str(fecha).split("-")[0] if fecha else "Desconocido"
             conteo_anios[anio] = conteo_anios.get(anio, 0) + 1
+
+    # 4. Calcular promedios y modas
+    if N > 0:
+        p_precio = suma_precio / N
+        p_desc = suma_descuento / N
+        p_mkt = suma_marketing / N
+        p_cajas = suma_cajas / N
+        
+        moda_prod = max(conteo_productos, key=conteo_productos.get) if conteo_productos else "Desconocido"
+        moda_anio = max(conteo_anios, key=conteo_anios.get) if conteo_anios else "Desconocido"
+    else:
+        p_precio = 0
+        p_desc = 0
+        p_mkt = 0
+        p_cajas = 0
+        moda_prod = "Desconocido"
+        moda_anio = "Desconocido"
+
+    end_time = get_time()
+    tiempo_ejecucion = delta_time(start_time, end_time)
+
+    # 5. Retornar en el orden esperado por view.py
+    return (tiempo_ejecucion, N, p_precio, p_desc, p_mkt, p_cajas, moda_prod, moda_anio)
 
     # 4. Calcular promedios
     if N > 0:
