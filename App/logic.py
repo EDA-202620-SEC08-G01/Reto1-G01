@@ -321,30 +321,73 @@ def req_4(catalog, producto, pais):
     """
 
     # TODO: Modificar el requerimiento 4
+    inicio = get_time()
     
     total_pedidos = 0
-    precio_prom_price = 0
+    prom_price = 0
     prom_discount = 0
     prom_marketing = 0
     prom_boxes = 0
-    dict_amount = {}
     
-    n = sl.size(catalog)
+    top_amount_1 = None
+    top_amount_2 = None
+    
+    n = sl.size(catalog["Product"])
     
     for i in range(1, n+1):
-        if (sl.get_element(catalog["Product"]) == producto) and (sl.get_element(catalog["Country"]) == pais):
-    
-            total_pedidos += 1
-            precio_prom_price += float(sl.get_element(catalog["Price_per_box"]))
-            prom_discount += float(sl.get_element(catalog["Discount_pct"]))
-            prom_marketing += float(sl.get_element(catalog["Marketing_spend"]))
-            prom_marketing += float(sl.get_element(catalog["Boxes_Shipped"]))
+        if (sl.get_element(catalog["Product"], i) == producto) and (sl.get_element(catalog["Country"], i) == pais):
             
-            dict_amount
+            total_pedidos+=1
+            
+            price = float(sl.get_element(catalog["Price_per_Box"], i))
+            discount = float(sl.get_element(catalog["Discount_Pct"], i))
+            marketing = float(sl.get_element(catalog["Marketing_Spend"], i))
+            boxes = float(sl.get_element(catalog["Boxes_Shipped"], i))
+            
+            prom_price += price
+            prom_discount += discount
+            prom_marketing += marketing
+            prom_boxes += boxes
+            
+            amount = float(sl.get_element(catalog["Amount"], i))
+            order_id = sl.get_element(catalog["Order_ID"], i)
+            channel = sl.get_element(catalog["Channel"], i)
+            fecha = sl.get_element(catalog["Order_Date"], i)
+
+
+            
+            posible = {"amount": amount,
+                       "marketing": marketing,
+                       "order_id": order_id,
+                       "channel": channel,
+                       "fecha": fecha
+                    }
+            
+            if top_amount_1 is None:
+                top_amount_1 = posible
+            
+            elif (amount > top_amount_1["amount"]) or ((amount == top_amount_1["amount"]) and (marketing < top_amount_1["marketing"])) or ((amount == top_amount_1["amount"]) and (marketing == top_amount_1["marketing"]) and (order_id < top_amount_1["order_id"])):
+                top_amount_2 = top_amount_1
+                top_amount_1 = posible
+        
+            elif top_amount_2 is None:
+                top_amount_2 = posible
+            
+            elif (amount > top_amount_2["amount"]) or ((amount == top_amount_2["amount"]) and (marketing < top_amount_2["marketing"])) or ((amount == top_amount_2["amount"]) and (marketing == top_amount_2["marketing"]) and (order_id < top_amount_2["order_id"])):
+                top_amount_2 = posible
+            
+    if total_pedidos == 0:
+        return "No hubo pedidos con esa combinación"
     
+    prom_price = prom_price / total_pedidos
+    prom_discount = prom_discount / total_pedidos
+    prom_marketing = prom_marketing / total_pedidos
+    prom_boxes = prom_boxes / total_pedidos
     
+    final = get_time()
+    tiempo_total = delta_time(inicio, final)
     
-    pass
+    return tiempo_total, prom_price, prom_discount, prom_marketing, prom_boxes, top_amount_1, top_amount_2
 
 
 def req_5(catalog, filtro, producto, fecha_inicial, fecha_final):
