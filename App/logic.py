@@ -219,142 +219,144 @@ def req_2(precio_minimo, precio_maximo, catalog):
     """
     Retorna el resultado del requerimiento 2
     """
-    # TODO: Modificar el requerimiento 2
     start_time = get_time()
     cantidad_pedidos = 0
     suma_discount_pct = 0
     suma_marketing_spend = 0
     suma_prices_per_box = 0
-    
-    pos_mayor_order_date = None
-    pos_menor_amount = None
-    pos_mayor_amount = None
-    
+
+    pedido_mas_reciente = None
+    pedido_menor_amount = None
+    pedido_mayor_amount = None
+
     catalog = catalog["array"]
-    
-    size = al.size(catalog["Price_per_Box"])
-    
+    size = al.size(catalog)
+
     for i in range(size):
-        precio = al.get_element(catalog["Price_per_Box"], i)
-        
+        fila = al.get_element(catalog, i)
+        precio = fila["Price_per_Box"]
+
         if precio_minimo <= precio <= precio_maximo:
             cantidad_pedidos += 1
             suma_prices_per_box += precio
-            
-            order_date = al.get_element(catalog["Order_Date"], i)
-            amount = al.get_element(catalog["Amount"], i)
-            
-            suma_discount_pct += al.get_element(catalog["Discount_Pct"], i)
-            suma_marketing_spend += al.get_element(catalog["Marketing_Spend"], i)
-            
-            if pos_mayor_order_date is None or order_date > al.get_element(catalog["Order_Date"], pos_mayor_order_date):
-                pos_mayor_order_date = i
-                
-            if order_date == al.get_element(catalog["Order_Date"], pos_mayor_order_date):
-                if amount > al.get_element(catalog["Amount"], pos_mayor_order_date):
-                    pos_mayor_order_date = i
-            
-            if pos_menor_amount is None or amount < al.get_element(catalog["Amount"], pos_menor_amount):
-                pos_menor_amount = i
+            suma_discount_pct += fila["Discount_Pct"]
+            suma_marketing_spend += fila["Marketing_Spend"]
 
-            if pos_mayor_amount is None or amount > al.get_element(catalog["Amount"], pos_mayor_amount):
-                pos_mayor_amount = i
+            if pedido_mas_reciente is None or fila["Order_Date"] > pedido_mas_reciente["Order_Date"]:
+                pedido_mas_reciente = fila
+            elif fila["Order_Date"] == pedido_mas_reciente["Order_Date"] and fila["Amount"] > pedido_mas_reciente["Amount"]:
+                pedido_mas_reciente = fila
 
-            if amount == al.get_element(catalog["Amount"], pos_mayor_amount):
-                if precio < al.get_element(catalog["Price_per_Box"], pos_mayor_amount):
-                    pos_mayor_amount = i
-            if amount == al.get_element(catalog["Amount"], pos_menor_amount):
-                if precio < al.get_element(catalog["Price_per_Box"], pos_menor_amount):
-                    pos_menor_amount = i
-                    
+            if pedido_menor_amount is None or fila["Amount"] < pedido_menor_amount["Amount"]:
+                pedido_menor_amount = fila
+            elif fila["Amount"] == pedido_menor_amount["Amount"] and precio < pedido_menor_amount["Price_per_Box"]:
+                pedido_menor_amount = fila
+
+            if pedido_mayor_amount is None or fila["Amount"] > pedido_mayor_amount["Amount"]:
+                pedido_mayor_amount = fila
+            elif fila["Amount"] == pedido_mayor_amount["Amount"] and precio < pedido_mayor_amount["Price_per_Box"]:
+                pedido_mayor_amount = fila
+
     promedio_discount_pct = suma_discount_pct / cantidad_pedidos if cantidad_pedidos > 0 else 0
     promedio_marketing_spend = suma_marketing_spend / cantidad_pedidos if cantidad_pedidos > 0 else 0
     promedio_prices_per_box = suma_prices_per_box / cantidad_pedidos if cantidad_pedidos > 0 else 0
-    
-    producto_mayor_order_date = al.get_element(catalog["Product"], pos_mayor_order_date) if pos_mayor_order_date is not None else None
-    pais_mayor_order_date = al.get_element(catalog["Country"], pos_mayor_order_date) if pos_mayor_order_date is not None else None
-    canal_mayor_order_date = al.get_element(catalog["Channel"], pos_mayor_order_date) if pos_mayor_order_date is not None else None
-    fecha_mayor_order_date = al.get_element(catalog["Order_Date"], pos_mayor_order_date) if pos_mayor_order_date is not None else None
-    precio_caja_mayor_order_date = al.get_element(catalog["Price_per_Box"], pos_mayor_order_date) if pos_mayor_order_date is not None else None
-    monto_mayor_order_date = al.get_element(catalog["Amount"], pos_mayor_order_date) if pos_mayor_order_date is not None else None
-
-    producto_mayor_amount = al.get_element(catalog["Product"], pos_mayor_amount) if pos_mayor_amount is not None else None
-    pais_mayor_amount = al.get_element(catalog["Country"], pos_mayor_amount) if pos_mayor_amount is not None else None
-    canal_mayor_amount = al.get_element(catalog["Channel"], pos_mayor_amount) if pos_mayor_amount is not None else None
-    fecha_mayor_amount = al.get_element(catalog["Order_Date"], pos_mayor_amount) if pos_mayor_amount is not None else None
-    precio_caja_mayor_amount = al.get_element(catalog["Price_per_Box"], pos_mayor_amount) if pos_mayor_amount is not None else None
-    monto_mayor_amount = al.get_element(catalog["Amount"], pos_mayor_amount) if pos_mayor_amount is not None else None
-
-    producto_menor_amount = al.get_element(catalog["Product"], pos_menor_amount) if pos_menor_amount is not None else None
-    pais_menor_amount = al.get_element(catalog["Country"], pos_menor_amount) if pos_menor_amount is not None else None
-    canal_menor_amount = al.get_element(catalog["Channel"], pos_menor_amount) if pos_menor_amount is not None else None
-    fecha_menor_amount = al.get_element(catalog["Order_Date"], pos_menor_amount) if pos_menor_amount is not None else None
-    precio_caja_menor_amount = al.get_element(catalog["Price_per_Box"], pos_menor_amount) if pos_menor_amount is not None else None
-    monto_menor_amount = al.get_element(catalog["Amount"], pos_menor_amount) if pos_menor_amount is not None else None
 
     end_time = get_time()
     tiempo_ejecucion = delta_time(start_time, end_time)
-    
-    return (tiempo_ejecucion, cantidad_pedidos, promedio_discount_pct, promedio_marketing_spend, promedio_prices_per_box, producto_mayor_order_date, pais_mayor_order_date, canal_mayor_order_date, fecha_mayor_order_date, precio_caja_mayor_order_date, monto_mayor_order_date, producto_mayor_amount, pais_mayor_amount, canal_mayor_amount, fecha_mayor_amount, precio_caja_mayor_amount, monto_mayor_amount, producto_menor_amount, pais_menor_amount, canal_menor_amount, fecha_menor_amount, precio_caja_menor_amount, monto_menor_amount)
+
+    return (tiempo_ejecucion, cantidad_pedidos, promedio_discount_pct, promedio_marketing_spend, promedio_prices_per_box, pedido_mas_reciente, pedido_mayor_amount, pedido_menor_amount)
 
 
 def req_3(catalog, Country, Channel):
     """
-    Retorna el resultado del requerimiento 3
+    Retorna el resultado del requerimiento 3 usando sl (Single Linked List)
     """
-    # TODO: Modificar el requerimiento 3
-    #pass
     start_time = get_time()
-    tamaño=data_structure.size(catalog["Order_ID"])
-    N=0
-    suma_precio=0
-    suma_descuento=0
-    suma_marketing=0
-    suma_cajas=0
     
-    productos = {}
-    años = {}
+    # 1. Acceder a la lista enlazada
+    catalog = catalog["single_linked"]
+    
+    # 2. Obtener el tamaño usando la librería sl
+    tamaño = sl.size(catalog)
+    
+    N = 0
+    suma_precio = 0
+    suma_descuento = 0
+    suma_marketing = 0
+    suma_cajas = 0
 
+    conteo_productos = {}
+    conteo_anios = {}
+
+    # 3. Recorrer usando sl.get_element(catalog, i)
     for i in range(tamaño):
-        pais = data_structure.get_element(catalog["Country"], i)
-        canal = data_structure.get_element(catalog["Channel"], i)
+        fila = sl.get_element(catalog, i)
         
-        if pais == Country and canal == Channel:
+        # Filtrar por País y Canal
+        if fila["Country"] == Country and fila["Channel"] == Channel:
             N += 1
+            suma_precio += fila["Price_per_Box"]
+            suma_descuento += fila["Discount_Pct"]
+            suma_marketing += fila["Marketing_Spend"]
+            suma_cajas += fila["Boxes_Shipped"]
             
-            precio = float(data_structure.get_element(catalog["Price_per_Box"], i))
-            descuento = float(data_structure.get_element(catalog["Discount_Pct"], i))
-            marketing = float(data_structure.get_element(catalog["Marketing_Spend"], i))
-            cajas = int(data_structure.get_element(catalog["Boxes_Shipped"], i))
+            # Conteo para el producto más frecuente
+            prod = fila["Product"]
+            conteo_productos[prod] = conteo_productos.get(prod, 0) + 1
             
-            suma_precio += precio
-            suma_descuento += descuento
-            suma_marketing += marketing
-            suma_cajas += cajas
-            
-            prod = data_structure.get_element(catalog["Product"], i)
-            productos[prod] = productos.get(prod, 0) + 1
-            
-            date_val = str(data_structure.get_element(catalog["Order_Date"], i))
-            year = date_val[:4]
-            años[year] = años.get(year, 0) + 1
+            # Conteo para el año con más pedidos
+            fecha = fila["Order_Date"]
+            anio = str(fecha).split("-")[0] if fecha else "Desconocido"
+            conteo_anios[anio] = conteo_anios.get(anio, 0) + 1
 
-    
-    
-    if N == 0:
-        return delta_time(start_time, end_time), 0, 0, 0, 0, 0, "Unknown", "Unknown"
+    # 4. Calcular promedios y modas
+    if N > 0:
+        p_precio = suma_precio / N
+        p_desc = suma_descuento / N
+        p_mkt = suma_marketing / N
+        p_cajas = suma_cajas / N
+        
+        moda_prod = max(conteo_productos, key=conteo_productos.get) if conteo_productos else "Desconocido"
+        moda_anio = max(conteo_anios, key=conteo_anios.get) if conteo_anios else "Desconocido"
+    else:
+        p_precio = 0
+        p_desc = 0
+        p_mkt = 0
+        p_cajas = 0
+        moda_prod = "Desconocido"
+        moda_anio = "Desconocido"
 
-    Prom_precio = suma_precio / N
-    Prom_descuento = suma_descuento / N
-    Prom_marketing = suma_marketing / N
-    Prom_cajas = suma_cajas / N
-    
-    Moda_producto = max(productos, key=productos.get)
-    Moda_año = max(años, key=años.get)
     end_time = get_time()
-    pop_time = delta_time(start_time, end_time)
+    tiempo_ejecucion = delta_time(start_time, end_time)
 
-    return pop_time, N, Prom_precio, Prom_cajas, Prom_descuento, Prom_marketing, Moda_año, Moda_producto
+    # 5. Retornar en el orden esperado por view.py
+    return (tiempo_ejecucion, N, p_precio, p_desc, p_mkt, p_cajas, moda_prod, moda_anio)
+
+    # 4. Calcular promedios
+    if N > 0:
+        p_precio = suma_precio / N
+        p_desc = suma_descuento / N
+        p_mkt = suma_marketing / N
+        p_cajas = suma_cajas / N
+        
+        # Encontrar la moda del producto (el más frecuente)
+        moda_prod = max(conteo_productos, key=conteo_productos.get) if conteo_productos else "Desconocido"
+        
+        # Encontrar la moda del año (el año con más pedidos)
+        moda_anio = max(conteo_anios, key=conteo_anios.get) if conteo_anios else "Desconocido"
+    else:
+        p_precio = 0
+        p_desc = 0
+        p_mkt = 0
+        p_cajas = 0
+        moda_prod = "Desconocido"
+        moda_anio = "Desconocido"
+
+    end_time = get_time()
+    tiempo_ejecucion = delta_time(start_time, end_time)
+
+    # 5. Retornar en el orden exacto que espera tu función print_req_3 en view.py
+    return (tiempo_ejecucion, N, p_precio, p_desc, p_mkt, p_cajas, moda_prod, moda_anio)
 
 def req_4(catalog, producto, pais):
     """
@@ -510,26 +512,25 @@ def req_6(catalog, Fecha_inicial, Fecha_final):
     Retorna el resultado del requerimiento 6
     """
     # TODO: Modificar el requerimiento 6
-    #pass
     start_time = get_time()
-    tamaño = data_structure.size(catalog["Order_ID"])
+    tamaño = al.size(catalog["Order_ID"])
     N = 0
     canales = {}
 
     for i in range(tamaño):
-        fecha = str(data_structure.get_element(catalog["Order_Date"], i))
+        fecha = str(al.get_element(catalog["Order_Date"], i))
         
         if Fecha_inicial <= fecha <= Fecha_final:
             N += 1
-            canal = data_structure.get_element(catalog["Channel"], i)
+            canal = al.get_element(catalog["Channel"], i)
             
-            orden = data_structure.get_element(catalog["Order_ID"], i)
-            producto = data_structure.get_element(catalog["Product"], i)
-            pais = data_structure.get_element(catalog["Country"], i)
-            monto = float(data_structure.get_element(catalog["Amount"], i))
-            precio = float(data_structure.get_element(catalog["Price_per_Box"], i))
-            marketing = float(data_structure.get_element(catalog["Marketing_Spend"], i))
-            cajas = int(data_structure.get_element(catalog["Boxes_Shipped"], i))
+            orden = al.get_element(catalog["Order_ID"], i)
+            producto = al.get_element(catalog["Product"], i)
+            pais = al.get_element(catalog["Country"], i)
+            monto = float(al.get_element(catalog["Amount"], i))
+            precio = float(al.get_element(catalog["Price_per_Box"], i))
+            marketing = float(al.get_element(catalog["Marketing_Spend"], i))
+            cajas = int(al.get_element(catalog["Boxes_Shipped"], i))
             
             pedido_actual = {
                 "Order_ID": orden,

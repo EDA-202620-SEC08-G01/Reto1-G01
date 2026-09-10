@@ -122,35 +122,91 @@ def print_req_2(control):
     """
     precio_minimo = float(input("Ingrese el precio mínimo del rango: "))
     precio_maximo = float(input("Ingrese el precio máximo del rango: "))
-    
+
     catalog = load_data(control)
     respuestas = logic.req_2(precio_minimo, precio_maximo, catalog)
-    
+
+    tiempo, cantidad, prom_descuento, prom_marketing, prom_precio, mas_reciente, mayor, menor = respuestas
+
     print("\n" + "="*50)
     print("RESULTADOS DEL REQUERIMIENTO 2")
     print("="*50)
-    print("Tiempo de ejecución: ", round(respuestas[0], 3), " ms")
-    print("Cantidad de pedidos en el rango: ", round(respuestas[1], 3))
-    print("Promedio del porcentaje de descuento: ", round(respuestas[2], 3), "%")
-    print("Promedio del gasto en marketing: $", round(respuestas[3], 3))
-    print("Promedio del precio por caja: $", round(respuestas[4], 3), "\n")
+    print("Tiempo de ejecución:", round(tiempo, 3), "ms")
+    print("Cantidad de pedidos en el rango:", cantidad)
+    print("Promedio del porcentaje de descuento:", round(prom_descuento, 3), "%")
+    print("Promedio del gasto en marketing: $", round(prom_marketing, 3))
+    print("Promedio del precio por caja: $", round(prom_precio, 3))
 
-    headers = ["Criterio", "Producto", "País", "Canal", "Fecha Pedido", "Precio/Caja", "Monto Total"]
-    
-    tabla = [
-        ["Más Reciente", *respuestas[5:11]],
-        ["Mayor Monto",  *respuestas[11:17]],
-        ["Menor Monto",  *respuestas[17:23]]
-    ]
-    
-    print(tabulate(tabla, headers=headers, tablefmt="grid"))
+    print("\n--- Pedido más reciente ---")
+    if mas_reciente is not None:
+        print("Producto:", mas_reciente["Product"])
+        print("País:", mas_reciente["Country"])
+        print("Canal:", mas_reciente["Channel"])
+        print("Fecha:", mas_reciente["Order_Date"])
+        print("Precio por caja:", mas_reciente["Price_per_Box"])
+        print("Monto:", mas_reciente["Amount"])
+    else:
+        print("Unknown")
+
+    print("\n--- Pedido de mayor monto ---")
+    if mayor is not None:
+        print("Producto:", mayor["Product"])
+        print("País:", mayor["Country"])
+        print("Canal:", mayor["Channel"])
+        print("Fecha:", mayor["Order_Date"])
+        print("Precio por caja:", mayor["Price_per_Box"])
+        print("Monto:", mayor["Amount"])
+    else:
+        print("Unknown")
+
+    print("\n--- Pedido de menor monto ---")
+    if menor is not None:
+        print("Producto:", menor["Product"])
+        print("País:", menor["Country"])
+        print("Canal:", menor["Channel"])
+        print("Fecha:", menor["Order_Date"])
+        print("Precio por caja:", menor["Price_per_Box"])
+        print("Monto:", menor["Amount"])
+    else:
+        print("Unknown")
     
 def print_req_3(control):
     """
         Función que imprime la solución del Requerimiento 3 en consola
     """
-    # TODO: Imprimir el resultado del requerimiento 3
-    pass
+     #TODO: Imprimir el resultado del requerimiento 3
+    print("\n" + "="*40)
+    print("        REQUERIMIENTO 3")
+    print("="*40)
+    
+    # 1. Pedir parámetros al usuario
+    pais = input("Ingrese el País a buscar (ej. United States): ")
+    canal = input("Ingrese el Canal a buscar (ej. Online): ")
+    
+    # 2. Llamar a la lógica correctamente
+    resultados = logic.req_3(control, pais, canal)
+    
+    # 3. Desempacar y mostrar resultados
+    if resultados:
+        # Extraemos en el mismo orden exacto del return de logic.req_3
+        tiempo, n, p_precio, p_desc, p_mkt, p_cajas, moda_prod, moda_anio = resultados
+        
+        print("\n--- RESULTADOS ---")
+        print(f"Tiempo de ejecución: {tiempo:.4f} ms")
+        
+        if n == 0:
+            print("\nNo se encontraron pedidos para la combinación de país y canal ingresada.")
+        else:
+            print(f"Total de pedidos (N): {n}")
+            print(f"Promedio de Price_per_Box:      ${p_precio:.2f}")
+            print(f"Promedio de Discount_Pct:       {p_desc:.2f}%")
+            print(f"Promedio de Marketing_Spend:    ${p_mkt:.2f}")
+            print(f"Promedio de Boxes_Shipped:      {p_cajas:.2f} cajas")
+            print(f"Producto más frecuente:         {moda_prod}")
+            print(f"Año con más pedidos:            {moda_anio}")
+    else:
+        print("\nError: No se obtuvieron resultados del controlador.")
+    print("="*40)
 
 
 def print_req_4(control):
@@ -224,10 +280,65 @@ def print_req_5(control):
 
 def print_req_6(control):
     """
-        Función que imprime la solución del Requerimiento 6 en consola
-    """
-    # TODO: Imprimir el resultado del requerimiento 6
-    pass
+    Función que imprime la solución del Requerimiento 6 en consola    """
+    print("\n" + "="*40)
+    print("        REQUERIMIENTO 6")
+    print("="*40)
+    
+    # 1. Pedir parámetros al usuario
+    start_date = input("Ingrese la Fecha de Inicio (YYYY-MM-DD): ")
+    end_date = input("Ingrese la Fecha de Fin (YYYY-MM-DD): ")
+    
+    # 2. Llamar a la lógica correctamente
+    resultados = logic.req_6(control, start_date, end_date)
+    
+    # 3. Desempacar y mostrar resultados
+    if resultados:
+        # Extraemos en el orden del return de logic.req_6
+        tiempo, n, canal_usado, canal_recaudador, info_canales = resultados
+        
+        print("\n--- RESULTADOS GLOBALES ---")
+        print(f"Tiempo de ejecución: {tiempo:.4f} ms")
+        
+        if n == 0:
+            print("\nNo se encontraron pedidos dentro de ese rango de fechas.")
+        else:
+            print(f"Número total de pedidos en el filtro: {n}")
+            
+            # Reporte del canal más usado
+            print("\nCANAL MÁS USADO:")
+            print(f" - Nombre: {canal_usado['Nombre']}")
+            print(f" - Total de pedidos: {canal_usado['Total_Pedidos']}")
+            print(f" - Total de recaudo: ${canal_usado['Total_Recaudo']:,.2f}")
+            
+            # Reporte del canal que más recauda
+            print("\nCANAL CON MAYOR RECAUDACIÓN:")
+            print(f" - Nombre: {canal_recaudador['Nombre']}")
+            print(f" - Total de pedidos: {canal_recaudador['Total_Pedidos']}")
+            print(f" - Total de recaudo: ${canal_recaudador['Total_Recaudo']:,.2f}")
+            
+            # Reporte detallado por cada canal
+            print("\n--- DETALLE POR CADA CANAL EN EL RANGO ---")
+            for canal, datos in info_canales.items():
+                print(f"\n> Canal: {canal}")
+                print(f"  Promedio Precio por Caja: ${datos['Precio_promedio']:,.2f}")
+                print(f"  Promedio Inversión Mercadeo: ${datos['Promedio_marketing']:,.2f}")
+                
+                # Pedido más costoso
+                p_max = datos['Pedido_mas_costoso']
+                print("  Pedido MÁS COSTOSO (por Amount):")
+                print(f"    Order_ID: {p_max['Order_ID']} | Product: {p_max['Product']} | Country: {p_max['Country']}")
+                print(f"    Order_Date: {p_max['Order_Date']} | Boxes_Shipped: {p_max['Boxes_Shipped']} | Amount: ${p_max['Amount']:,.2f}")
+                
+                # Pedido más barato
+                p_min = datos['Pedido_mas_barato']
+                print("  Pedido MÁS BARATO (por Amount):")
+                print(f"    Order_ID: {p_min['Order_ID']} | Product: {p_min['Product']} | Country: {p_min['Country']}")
+                print(f"    Order_Date: {p_min['Order_Date']} | Boxes_Shipped: {p_min['Boxes_Shipped']} | Amount: ${p_min['Amount']:,.2f}")
+
+    else:
+        print("\nError: No se obtuvieron resultados del controlador.")
+    print("="*40)
 
 # Se crea la lógica asociado a la vista
 control = new_logic()
