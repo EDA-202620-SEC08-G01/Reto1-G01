@@ -265,60 +265,69 @@ def req_3(catalog, Country, Channel):
     """
     Retorna el resultado del requerimiento 3
     """
-    # TODO: Modificar el requerimiento 3
-    
-    catalog=catalog["Array"]
     start_time = get_time()
-    tamaño=sl.size(catalog["Order_ID"])
-    N=0
-    suma_precio=0
-    suma_descuento=0
-    suma_marketing=0
-    suma_cajas=0
     
-    productos = {}
-    años = {}
+    # 1. Extraer el array correctamente
+    catalog = catalog["array"]
+    
+    # 2. Obtener el tamaño usando la librería de arreglos
+    tamaño = sl.size(catalog)
+    
+    N = 0
+    suma_precio = 0
+    suma_descuento = 0
+    suma_marketing = 0
+    suma_cajas = 0
 
+    conteo_productos = {}
+    conteo_anios = {}
+
+    # 3. Recorrer el arreglo elemento por elemento
     for i in range(tamaño):
-        pais = al.get_element(catalog["Country"], i)
-        canal = al.get_element(catalog["Channel"], i)
+        fila = sl.get_element(catalog, i)
         
-        if pais == Country and canal == Channel:
+        # Filtrar por País y Canal
+        if fila["Country"] == Country and fila["Channel"] == Channel:
             N += 1
+            suma_precio += fila["Price_per_Box"]
+            suma_descuento += fila["Discount_Pct"]
+            suma_marketing += fila["Marketing_Spend"]
+            suma_cajas += fila["Boxes_Shipped"]
             
-            precio = float(al.get_element(catalog["Price_per_Box"], i))
-            descuento = float(al.get_element(catalog["Discount_Pct"], i))
-            marketing = float(al.get_element(catalog["Marketing_Spend"], i))
-            cajas = int(al.get_element(catalog["Boxes_Shipped"], i))
+            # Conteo para el producto más frecuente
+            prod = fila["Product"]
+            conteo_productos[prod] = conteo_productos.get(prod, 0) + 1
             
-            suma_precio += precio
-            suma_descuento += descuento
-            suma_marketing += marketing
-            suma_cajas += cajas
-            
-            prod = al.get_element(catalog["Product"], i)
-            productos[prod] = productos.get(prod, 0) + 1
-            
-            date_val = str(al.get_element(catalog["Order_Date"], i))
-            year = date_val[:4]
-            años[year] = años.get(year, 0) + 1
+            # Conteo para el año con más pedidos (Extrayendo el año de 'Order_Date', ej: "2022-01-22" -> "2022")
+            fecha = fila["Order_Date"]
+            anio = str(fecha).split("-")[0] if fecha else "Desconocido"
+            conteo_anios[anio] = conteo_anios.get(anio, 0) + 1
 
-    
-    
-    if N == 0:
-        return delta_time(start_time, end_time), 0, 0, 0, 0, 0, "Unknown", "Unknown"
+    # 4. Calcular promedios
+    if N > 0:
+        p_precio = suma_precio / N
+        p_desc = suma_descuento / N
+        p_mkt = suma_marketing / N
+        p_cajas = suma_cajas / N
+        
+        # Encontrar la moda del producto (el más frecuente)
+        moda_prod = max(conteo_productos, key=conteo_productos.get) if conteo_productos else "Desconocido"
+        
+        # Encontrar la moda del año (el año con más pedidos)
+        moda_anio = max(conteo_anios, key=conteo_anios.get) if conteo_anios else "Desconocido"
+    else:
+        p_precio = 0
+        p_desc = 0
+        p_mkt = 0
+        p_cajas = 0
+        moda_prod = "Desconocido"
+        moda_anio = "Desconocido"
 
-    Prom_precio = suma_precio / N
-    Prom_descuento = suma_descuento / N
-    Prom_marketing = suma_marketing / N
-    Prom_cajas = suma_cajas / N
-    
-    Moda_producto = max(productos, key=productos.get)
-    Moda_año = max(años, key=años.get)
     end_time = get_time()
-    pop_time = delta_time(start_time, end_time)
+    tiempo_ejecucion = delta_time(start_time, end_time)
 
-    return pop_time, N, Prom_precio, Prom_cajas, Prom_descuento, Prom_marketing, Moda_año, Moda_producto
+    # 5. Retornar en el orden exacto que espera tu función print_req_3 en view.py
+    return (tiempo_ejecucion, N, p_precio, p_desc, p_mkt, p_cajas, moda_prod, moda_anio)
 
 def req_4(catalog, producto, pais):
     """
