@@ -27,17 +27,68 @@ def print_menu():
 
 def load_data(control):
     """
-    Carga los datos
+        Carga los datos del archivo en el catálogo.
     """
-    #TODO: Realizar la carga de datos
-    pass
+    if logic.al.size(control["array"]) == 0:
+        filename = "chocolate_sale_100_ptc.csv"
+
+        tiempo, total, pedido_menor, pedido_mayor, primeros_5, ultimos_5 = logic.load_data(control, filename)
+
+        print("\nTiempo de carga:", round(tiempo, 3), "[ms]")
+        print("Total de pedidos cargados:", total)
+
+        print("\n--- Pedido de menor Amount ---")
+        print("Order_ID:", pedido_menor["Order_ID"])
+        print("Product:", pedido_menor["Product"])
+        print("Country:", pedido_menor["Country"])
+        print("Channel:", pedido_menor["Channel"])
+        print("Order_Date:", pedido_menor["Order_Date"])
+        print("Price_per_Box:", pedido_menor["Price_per_Box"])
+        print("Amount:", pedido_menor["Amount"])
+
+        print("\n--- Pedido de mayor Amount ---")
+        print("Order_ID:", pedido_mayor["Order_ID"])
+        print("Product:", pedido_mayor["Product"])
+        print("Country:", pedido_mayor["Country"])
+        print("Channel:", pedido_mayor["Channel"])
+        print("Order_Date:", pedido_mayor["Order_Date"])
+        print("Price_per_Box:", pedido_mayor["Price_per_Box"])
+        print("Amount:", pedido_mayor["Amount"])
+
+        print("\n--- Primeros 5 pedidos ---")
+        for i in range(logic.al.size(primeros_5)):
+            p = logic.al.get_element(primeros_5, i)
+            print(p["Order_ID"], p["Product"], p["Country"], p["Channel"], p["Order_Date"], p["Price_per_Box"], p["Amount"])
+
+        print("\n--- Últimos 5 pedidos ---")
+        for i in range(logic.al.size(ultimos_5)):
+            p = logic.al.get_element(ultimos_5, i)
+            print(p["Order_ID"], p["Product"], p["Country"], p["Channel"], p["Order_Date"], p["Price_per_Box"], p["Amount"])
+
+    return control
 
 def print_data(control, id):
     """
         Función que imprime un dato dado su ID
     """
-    #TODO: Realizar la función para imprimir un elemento
-    pass
+    encontrado = None
+    total = logic.al.size(control["array"])
+    for i in range(total):
+        pedido = logic.al.get_element(control["array"], i)
+        if pedido["Order_ID"] == id:
+            encontrado = pedido
+            break
+
+    if encontrado is not None:
+        print("Order_ID:", encontrado["Order_ID"])
+        print("Product:", encontrado["Product"])
+        print("Country:", encontrado["Country"])
+        print("Channel:", encontrado["Channel"])
+        print("Order_Date:", encontrado["Order_Date"])
+        print("Price_per_Box:", encontrado["Price_per_Box"])
+        print("Amount:", encontrado["Amount"])
+    else:
+        print("Unknown")
 
 def print_req_1(control):
     """

@@ -10,7 +10,7 @@ from DataStructures.List import single_linked_list as sl
 
 csv.field_size_limit(2147483647)
 
-data_dir = os.path.dirname(os.path.realpath('__file__')) + '/Data/GoodReads'
+data_dir = os.path.dirname(os.path.realpath('__file__')) + '/Data/'
 
 def new_logic():
     
@@ -26,14 +26,49 @@ def load_data(catalog, filename):
     """
     Carga los datos del reto
     """
-    # TODO: Realizar la carga de datos
-    booksfile = data_dir + '/chocolate_sale_100_ptc'
-    input_file = csv.DictReader(open(booksfile, encoding='utf-8'))
-    for pedido in input_file:
-        add_book(catalog, book)
-    return book_size(catalog), author_size(catalog)
-    pass
+    start_time = get_time()
 
+    with open(data_dir + filename, encoding='utf-8-sig') as f:
+        archivo = csv.DictReader(f)
+
+        pedido_menor = None
+        pedido_mayor = None
+
+        for fila in archivo:
+            fila["Discount_Pct"] = float(fila["Discount_Pct"])
+            fila["Price_per_Box"] = float(fila["Price_per_Box"])
+            fila["Marketing_Spend"] = float(fila["Marketing_Spend"])
+            fila["Boxes_Shipped"] = int(fila["Boxes_Shipped"])
+            fila["Amount"] = float(fila["Amount"])
+
+            al.add_last(catalog["array"], fila)
+            sl.add_last(catalog["single_linked"], fila)
+
+            if pedido_menor is None or fila["Amount"] < pedido_menor["Amount"]:
+                pedido_menor = fila
+            elif fila["Amount"] == pedido_menor["Amount"] and fila["Price_per_Box"] < pedido_menor["Price_per_Box"]:
+                pedido_menor = fila
+
+            if pedido_mayor is None or fila["Amount"] > pedido_mayor["Amount"]:
+                pedido_mayor = fila
+            elif fila["Amount"] == pedido_mayor["Amount"] and fila["Price_per_Box"] < pedido_mayor["Price_per_Box"]:
+                pedido_mayor = fila
+
+    total_pedidos = al.size(catalog["array"])
+
+    primeros_5 = al.new_list()
+    for i in range(min(5, total_pedidos)):
+        al.add_last(primeros_5, al.get_element(catalog["array"], i))
+
+    ultimos_5 = al.new_list()
+    for i in range(max(0, total_pedidos - 5), total_pedidos):
+        al.add_last(ultimos_5, al.get_element(catalog["array"], i))
+
+    end_time = get_time()
+    tiempo_carga = delta_time(start_time, end_time)
+
+    return tiempo_carga, total_pedidos, pedido_menor, pedido_mayor, primeros_5, ultimos_5
+        
 
 # Funciones de consulta sobre el catálogo
 
@@ -205,6 +240,7 @@ def req_5(catalog, filtro, producto, fecha_inicial, fecha_final):
     suma_precio = 0
     suma_cajas = 0
     suma_inversion_mercado = 0
+    catalog = catalog["single_linked"]
     actual = catalog["first"]
     orden_comparacion = None
     
