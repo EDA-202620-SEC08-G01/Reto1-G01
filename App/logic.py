@@ -136,6 +136,10 @@ def req_1(catalog, nom_producto):
                 less_amount = amount
                 ubicacion_less_amount = i
 
+    
+    if contador == 0:
+        return "No existe ese nombre en los datos"
+
     año_top = None
     max_conteo = 0
     
@@ -149,7 +153,7 @@ def req_1(catalog, nom_producto):
     c = al.get_element(catalog["Order_Date"],ubicacion_max_amount) 
     d = al.get_element(catalog["Price_per_Box"],ubicacion_max_amount) 
     
-    info_mayor_amount = "Mayor amount = "+str(a)+" "+str(b)+" "+str(c)+" "+str(c)+" "+str(d)+" "+str(max_amount)
+    info_mayor_amount = "Mayor amount = "+str(a)+" "+str(b)+" "+str(c)+" "+str(d)+" "+str(max_amount)
     
     e = al.get_element(catalog["Order_ID"],ubicacion_less_amount)
     f = al.get_element(catalog["Country"],ubicacion_less_amount)
